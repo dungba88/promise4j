@@ -86,3 +86,7 @@ promise.done(response -> {
 Same for rejecting case, you will use `SimpleFailurePromise`
 
 *All simple versions are not thread-safe and should be used with cautions*
+
+## limitations
+
+Currently `promise4j` only supports 1 done callback and 1 fail callback per `Promise`. Adding more callbacks by calling multiple `done()` or `fail()` will lead to unexpected results.
