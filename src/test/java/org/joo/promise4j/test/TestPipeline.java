@@ -132,6 +132,9 @@ public class TestPipeline {
             Assert.assertEquals(1, response.intValue());
         }).pipeDone(response -> {
             return new SimpleFailurePromise<>(new IllegalArgumentException());
+        }).pipeDone(response -> {
+            // should not called here
+            return new SimpleDonePromise<>(1);
         }).done(response -> {
             latch.countDown();
         }).fail(ex -> {
