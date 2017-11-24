@@ -40,9 +40,9 @@ Then you can pass it to the provider (the one who actually do the job), there yo
 
 ```java
 try {
-  someResponse = ... // get the response
+  SomeResponseClass someResponse = ... // get the response
   deferred.resolve(someResponse); // resolve the job
-} catch(Exception ex) {
+} catch(SomeExceptionClass ex) {
   deferred.reject(ex);  // cannot fulfill the job, reject it
 }
 ```
