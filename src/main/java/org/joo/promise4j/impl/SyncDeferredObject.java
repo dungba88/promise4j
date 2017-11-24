@@ -23,7 +23,7 @@ public class SyncDeferredObject<D, F extends Throwable> implements Deferred<D, F
     public Deferred<D, F> resolve(final D resolve) {
         synchronized (this) {
             if (!isPending())
-                throw new IllegalStateException("Deferred object already finished, cannot resolve again");
+                throw new IllegalStateException("Deferred is already resolved or rejected");
 
             this.status = DeferredStatus.RESOLVED;
             this.result = resolve;
@@ -36,7 +36,7 @@ public class SyncDeferredObject<D, F extends Throwable> implements Deferred<D, F
     public Deferred<D, F> reject(final F reject) {
         synchronized (this) {
             if (!isPending())
-                throw new IllegalStateException("Deferred object already finished, cannot reject again");
+                throw new IllegalStateException("Deferred is already resolved or rejected");
             this.status = DeferredStatus.REJECTED;
             this.failedCause = reject;
             triggerFail(failCallback, reject);
