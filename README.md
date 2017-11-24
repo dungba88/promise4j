@@ -40,10 +40,10 @@ Then you can pass it to the provider (the one who actually do the job), there yo
 
 ```java
 try {
-  SomeResponseClass someResponse = ... // get the response
-  deferred.resolve(someResponse); // resolve the job
+    SomeResponseClass someResponse = ... // get the response
+    deferred.resolve(someResponse); // resolve the job
 } catch(SomeExceptionClass ex) {
-  deferred.reject(ex);  // cannot fulfill the job, reject it
+    deferred.reject(ex);  // cannot fulfill the job, reject it
 }
 ```
 
@@ -73,6 +73,7 @@ DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new SimpleDefer
 ```
 
 2. If you already have the response, you don't even need to create a `Deferred`!:
+
 ```java
 SimpleDonePromise promise = new SimpleDonePromise(response);
 
@@ -81,4 +82,5 @@ promise.done(response -> {
     // do something with the response
 });
 ```
+
 Same for rejecting case, you will use `SimpleFailurePromise`
