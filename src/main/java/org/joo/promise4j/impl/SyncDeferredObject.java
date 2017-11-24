@@ -6,7 +6,6 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 
-@Deprecated
 public class SyncDeferredObject<D, F extends Throwable> implements Deferred<D, F>, Promise<D, F> {
 
     private D result;
