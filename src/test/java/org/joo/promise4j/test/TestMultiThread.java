@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.impl.AsyncDeferredObject;
+import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.SyncDeferredObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -63,6 +64,7 @@ public class TestMultiThread {
         List<Object[]> list = new ArrayList<>();
         list.add(new Object[] {(Supplier<Deferred<Object, Throwable>>) () -> new AsyncDeferredObject<>()});
         list.add(new Object[] {(Supplier<Deferred<Object, Throwable>>) () -> new SyncDeferredObject<>()});
+        list.add(new Object[] {(Supplier<Deferred<Object, Throwable>>) () -> new CompletableDeferredObject<>()});
         return list;
     }
 }

@@ -1,0 +1,46 @@
+package org.joo.promise4j.impl;
+
+import java.util.concurrent.CompletableFuture;
+
+import org.joo.promise4j.Deferred;
+import org.joo.promise4j.DoneCallback;
+import org.joo.promise4j.FailCallback;
+import org.joo.promise4j.Promise;
+
+public class CompletableDeferredObject<D, F extends Throwable> implements Deferred<D, F>, Promise<D, F> {
+    
+    private CompletableFuture<D> future = new CompletableFuture<>();
+
+    @Override
+    public Promise<D, F> done(DoneCallback<D> callback) {
+        future.thenAccept((response) -> callback.onDone(response));
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Promise<D, F> fail(FailCallback<F> callback) {
+        future.exceptionally(ex -> {
+            callback.onFail((F) ex);
+            return null;
+        });
+        return this;
+    }
+
+    @Override
+    public Deferred<D, F> resolve(D result) {
+        future.complete(result);
+        return this;
+    }
+
+    @Override
+    public Deferred<D, F> reject(F failedCause) {
+        future.completeExceptionally(failedCause);
+        return this;
+    }
+
+    @Override
+    public Promise<D, F> promise() {
+        return this;
+    }
+}
