@@ -51,15 +51,15 @@ In your consumer, you can call `promise()` to get the promise, and wait for its 
 
 ```java
 deferred.promise().done(response -> {
-  // do something with the response
+    // do something with the response
 }).fail(ex -> {
-  // do something with the exception
+    // do something with the exception
 });
 ```
 
 The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called.
 
-## simple version
+## simple versions
 
 Sometimes, it's not necessary to use `AsynchronousDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
 
