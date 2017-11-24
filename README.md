@@ -30,13 +30,15 @@ Install with Maven:
 
 ## how to use
 
-First you have to construct a deferred object, which is an instance of `Deferred`. There is `AsyncDeferredObject` and `SyncDeferredObject` that is ready to use. The asynchronous version will use [spinlocks](https://en.wikipedia.org/wiki/Spinlock) to be thread-safe, while the synchronous version will make use of `synchronized` keyword. The synchronous version is not favored, since it can cause deadlocks. To create an asynchronous deferred object:
+First you have to construct a deferred object, which is an instance of `Deferred`. There is `AsyncDeferredObject`, `SyncDeferredObject` and `CompletableDeferredObject` that is ready to use. The asynchronous version will use [spinlocks](https://en.wikipedia.org/wiki/Spinlock) to be thread-safe, while the synchronous version will make use of `synchronized` keyword. The completable version uses Java 8 `CompletableFuture` and can support multi-callbacks. The synchronous version is not favored, since it can cause deadlocks.
+
+To create an asynchronous deferred object:
 
 ```java
 DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new AsyncDeferredObject<>();
 ```
 
-Then you can pass it to the provider (the one who actually do the job), there you can call `resolve()` or `reject()`:
+Same for other deferred type. Then you can pass it to the provider (the one who actually do the job), there you can call `resolve()` or `reject()`:
 
 ```java
 try {
@@ -59,9 +61,33 @@ deferred.promise().done(response -> {
 
 The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called.
 
+You can also chain the processing via `pipeDone()` and `pipeFail`:
+
+```java
+deferred.promise().pipeDone(response -> {   // PIPE 1
+    // this will be called only when the original deferred resolved successfully
+    // it will create new pipe
+    return somePromise;
+}).pipeDone(response -> {   // PIPE 2
+    // this will be called only when the PIPE 1 resolve successfully
+    // it will create new pipe
+    return somePromise;
+}).pipeFail(ex -> { // PIPE 3
+    // this will be called only when the PIPE 2 is rejected
+    // it will create new pipe
+    return somePromise;
+}).done(response -> {
+    // this will be called only when the PIPE 3 resolve successfully
+    // it will not create any pipe
+}).fail(response -> {
+    // this will be called only when the PIPE 3 is rejected
+    // it will not create any pipe
+});
+```
+
 ## simple versions
 
-Sometimes, it's not necessary to use `AsynchronousDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
+Sometimes, it's not necessary to use `AsyncDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
 
 1. If you already have the done/fail callback and not intend to assign the callback later:
 
@@ -89,8 +115,7 @@ Same for rejecting case, you will use `SimpleFailurePromise`
 
 ## limitations
 
-Currently `promise4j` only supports 1 done callback and 1 fail callback per `Promise`. Adding more callbacks by calling multiple `done()` or `fail()` will lead to unexpected results.
-
+Currently `AsyncDeferredObject` and `SyncDeferredObject` only supports 1 done callback and 1 fail callback per `Promise`. Adding more callbacks by calling multiple `done()` or `fail()` will lead to unexpected results. Only `CompletableDeferredObject` will support multi-callbacks.
 
 ## deadlocks with SyncDeferredObject
 
