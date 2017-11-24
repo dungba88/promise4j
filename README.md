@@ -64,23 +64,23 @@ The done callback will be called when the provider call `resolve()` with a respo
 You can also chain the processing via `pipeDone()` and `pipeFail`:
 
 ```java
-deferred.promise().pipeDone(response -> {   // PIPE 1
+deferred.promise().pipeDone(response -> {
     // this will be called only when the original deferred resolved successfully
     // it will create new pipe
     return somePromise;
-}).pipeDone(response -> {   // PIPE 2
-    // this will be called only when the PIPE 1 resolve successfully
+}).pipeDone(response -> {
+    // this will be called only when the preceding executed pipe resolve successfully
     // it will create new pipe
     return somePromise;
 }).pipeFail(ex -> { // PIPE 3
-    // this will be called only when the PIPE 2 is rejected
+    // this will be called only when the preceding executed pipe is rejected
     // it will create new pipe
     return somePromise;
 }).done(response -> {
-    // this will be called only when the PIPE 3 resolve successfully
+    // this will be called only when the preceding executed pipe resolve successfully
     // it will not create any pipe
 }).fail(response -> {
-    // this will be called only when the PIPE 3 is rejected
+    // this will be called only when the preceding executed pipe is rejected
     // it will not create any pipe
 });
 ```
