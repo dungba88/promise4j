@@ -30,7 +30,7 @@ Install with Maven:
 
 ## how to use
 
-First you have to construct a deferred object, which is an instance of `Deferred`. There is `AsyncDeferredObject` and `SyncDeferredObject` that is ready to use. The asynchronous version will use [spinlocks](https://en.wikipedia.org/wiki/Spinlock) to be thread-safe, while the synchronous version will make use of `synchronized` keyword. The synchronous version is deprecated, since it can cause deadlocks. To create an asynchronous deferred object:
+First you have to construct a deferred object, which is an instance of `Deferred`. There is `AsyncDeferredObject` and `SyncDeferredObject` that is ready to use. The asynchronous version will use [spinlocks](https://en.wikipedia.org/wiki/Spinlock) to be thread-safe, while the synchronous version will make use of `synchronized` keyword. The synchronous version is not favored, since it can cause deadlocks. To create an asynchronous deferred object:
 
 ```java
 DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new AsyncDeferredObject<>();
@@ -90,3 +90,8 @@ Same for rejecting case, you will use `SimpleFailurePromise`
 ## limitations
 
 Currently `promise4j` only supports 1 done callback and 1 fail callback per `Promise`. Adding more callbacks by calling multiple `done()` or `fail()` will lead to unexpected results.
+
+
+## deadlocks with SyncDeferredObject
+
+There are cases where `SyncDeferredObject` can cause deadlock. Because it uses `synchronized` so the thread registering the callback (calls `promise.done(...)`) and the thread resolving the deferred (calls `deferred.resolved(...)`) will have to wait on the same lock. If they again both wait for another lock, then deadlock might happen. So you should use it with cautions and make sure they don't wait on any other lock. This might not be obvious since it depends on the framework/platform you use.
