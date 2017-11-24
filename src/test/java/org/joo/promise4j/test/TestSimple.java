@@ -21,12 +21,14 @@ public class TestSimple {
         
         try {
             deferred.resolve(1);
+            Assert.fail("must fail");
         } catch (IllegalStateException ex) {
             Assert.assertEquals("Deferred is already resolved or rejected", ex.getMessage());
         }
         
         try {
             deferred.promise().done(null);
+            Assert.fail("must fail");
         } catch (UnsupportedOperationException ex) {
             Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
         }
@@ -43,12 +45,33 @@ public class TestSimple {
         
         try {
             deferred.reject(new UnsupportedOperationException());
+            Assert.fail("must fail");
         } catch (IllegalStateException ex) {
             Assert.assertEquals("Deferred is already resolved or rejected", ex.getMessage());
         }
         
         try {
             deferred.promise().fail(null);
+            Assert.fail("must fail");
+        } catch (UnsupportedOperationException ex) {
+            Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        }
+    }
+    
+    @Test
+    public void testSimplePipe() {
+        Deferred<Object, Throwable> deferred = new SimpleDeferredObject<>(response -> {
+        }, ex -> {
+        });
+        try {
+            deferred.promise().pipeDone(null);
+            Assert.fail("must fail");
+        } catch (UnsupportedOperationException ex) {
+            Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        }
+        try {
+            deferred.promise().pipeFail(null);
+            Assert.fail("must fail");
         } catch (UnsupportedOperationException ex) {
             Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
         }

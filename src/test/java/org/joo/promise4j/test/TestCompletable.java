@@ -10,10 +10,10 @@ import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestMultiCallback {
-
+public class TestCompletable {
+    
     @Test
-    public void test() {
+    public void testMultiCallback() {
         ExecutorService executor = Executors.newFixedThreadPool(7);
         CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger atomicCounter = new AtomicInteger(0);
@@ -25,11 +25,11 @@ public class TestMultiCallback {
             executor.submit(() -> {
                 deferred.resolve(1);
             });
-            deferred.promise().done(done -> {
+            deferred.promise().done(response -> {
                 if (atomicCounter.incrementAndGet() == iterations * 2) {
                     latch.countDown();
                 }
-            }).done(done -> {
+            }).done(response -> {
                 if (atomicCounter.incrementAndGet() == iterations * 2) {
                     latch.countDown();
                 }
@@ -37,7 +37,7 @@ public class TestMultiCallback {
                 Assert.fail();
             });
         }
-        
+
         try {
             latch.await();
         } catch (InterruptedException e) {

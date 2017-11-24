@@ -6,7 +6,7 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 
-public class SyncDeferredObject<D, F extends Throwable> implements Deferred<D, F>, Promise<D, F> {
+public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
     private D result;
 
@@ -79,6 +79,7 @@ public class SyncDeferredObject<D, F extends Throwable> implements Deferred<D, F
         }
     }
 
+    @Override
     public Promise<D, F> promise() {
         return this;
     }

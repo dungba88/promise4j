@@ -4,7 +4,7 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 
-public class SimpleFailurePromise<D, F extends Throwable> implements Promise<D, F> {
+public class SimpleFailurePromise<D, F extends Throwable> extends AbstractPromise<D, F> {
 
     private F failedCause;
 

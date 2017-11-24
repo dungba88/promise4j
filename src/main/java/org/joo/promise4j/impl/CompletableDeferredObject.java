@@ -7,10 +7,14 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 
-public class CompletableDeferredObject<D, F extends Throwable> implements Deferred<D, F>, Promise<D, F> {
+public class CompletableDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
     
-    private CompletableFuture<D> future = new CompletableFuture<>();
-
+    private CompletableFuture<D> future;
+    
+    public CompletableDeferredObject() {
+        this.future = new CompletableFuture<>();
+    }
+    
     @Override
     public Promise<D, F> done(DoneCallback<D> callback) {
         future.thenAccept((response) -> callback.onDone(response));

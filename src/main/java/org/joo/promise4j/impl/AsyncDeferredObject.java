@@ -8,7 +8,7 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 
-public class AsyncDeferredObject<D, F extends Throwable> implements Deferred<D, F>, Promise<D, F> {
+public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
     private D result;
 
