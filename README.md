@@ -33,7 +33,7 @@ Install with Maven:
 First you have to construct a deferred object, which is an instance of `Deferred`. There is `AsyncDeferredObject` and `SyncDeferredObject` that is ready to use. The asynchronous version will use [spinlocks](https://en.wikipedia.org/wiki/Spinlock) to be thread-safe, while the synchronous version will make use of `synchronized` keyword. The synchronous version is deprecated, since it can cause deadlocks. To create an asynchronous deferred object:
 
 ```java
-AsyncDeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new AsyncDeferredObject<>();
+DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new AsyncDeferredObject<>();
 ```
 
 Then you can pass it to the provider (the one who actually do the job), there you can call `resolve()` or `reject()`:
@@ -58,3 +58,27 @@ deferred.promise().done(response -> {
 ```
 
 The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called.
+
+## simple version
+
+Sometimes, it's not necessary to use `AsynchronousDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
+
+1. If you already have the done/fail callback and not intend to assign the callback later:
+
+```java
+DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new SimpleDeferredObject<>(doneCallback, failCallback);
+
+// resolve or reject as usual
+...
+```
+
+2. If you already have the response, you don't even need to create a `Deferred`!:
+```java
+SimpleDonePromise promise = new SimpleDonePromise(response);
+
+// register done callback as usual
+promise.done(response -> {
+    // do something with the response
+});
+```
+Same for rejecting case, you will use `SimpleFailurePromise`
