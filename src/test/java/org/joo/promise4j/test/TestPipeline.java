@@ -29,6 +29,40 @@ public class TestPipeline {
     }
     
     @Test
+    public void testPipelineFailPropagation() {
+        CountDownLatch latch = new CountDownLatch(1);
+        result = false;
+        
+        final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
+        deferred.promise().done(response -> {
+            Assert.assertEquals(1, response.intValue());
+        }).fail(ex -> {
+            Assert.assertTrue(ex instanceof NullPointerException);
+        }).pipeDone(response -> {
+            return new SimpleDonePromise<>(response + 1);
+        }).pipeDone(response -> {
+            return new SimpleDonePromise<>(response + "");
+        }).done(response -> {
+            latch.countDown();
+        }).fail(ex -> {
+            if (ex instanceof NullPointerException) {
+                result = true;
+            }
+            latch.countDown();
+        });
+        
+        deferred.reject(new NullPointerException());
+        
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        
+        Assert.assertTrue(result);
+    }
+    
+    @Test
     public void testDonePipelineException() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
