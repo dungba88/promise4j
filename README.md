@@ -15,7 +15,7 @@ A promise is...well, a promise. Let say you ask somebody to do something for you
 - The person you asks is called a *deferred object*. A deferred object will give you a *promise*
 - The act of fulfilling the job is called *resolve*
 - The act of rejecting the job is called *reject*
-- You use `callbacks` to wait for the result
+- You use *callbacks* to wait for the result
 
 ## install
 
