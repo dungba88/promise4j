@@ -110,7 +110,38 @@ If any exception is thrown while executing the preceding stage, that stage is co
 });
 ```
 
-Best practice is that you always be consistent in the exception type and try not to throw exception.
+Best practice is that you always be consistent in the exception type and try not to throw exception. There are two ways you can achieve this:
+
+1. Try to catch the exception and reject the promise yourself
+
+```java
+...pipeDone(response -> {
+    try {
+        if (...)    // some condition that raise the exception
+            throw new IllegalArgumentException();
+        return new SimpleFailurePromise(new UnsupportedOperationException());
+    } catch (Throwable ex) {
+        // convert ex to correct exception type
+        // this can be done by using ex as the cause of the expected exception
+        // e.g: expectedException = new UnsupportedOperationException(ex);
+        return new SimpleFailurePromise(expectedException);
+    }
+}).pipeFail(ex -> {
+    // ex can only be of type UnsupportedOperationException
+});
+```
+
+2. Explicitly return Promise<ANY_TYPE, ANY_TYPE, Throwable> to cover all exception types.
+
+```java
+...pipeDone((PipeDoneCallback<Integer, Integer, Throwable>)response -> {
+    // return promise of Throwable type
+}).pipeFail(ex -> {
+    // ex can be of any type here
+});
+```
+
+Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`.
 
 ## simple versions
 
