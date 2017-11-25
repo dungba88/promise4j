@@ -131,7 +131,7 @@ Best practice is that you always be consistent in the exception type and try not
 });
 ```
 
-2. Explicitly return Promise<ANY_TYPE, ANY_TYPE, Throwable> to cover all exception types.
+2. Explicitly use a PipeDoneCallback<ANY_TYPE, ANY_TYPE, Throwable> or PipeFailureCallback<ANY_TYPE, ANY_TYPE, Throwable> to cover all exception types.
 
 ```java
 ...pipeDone((PipeDoneCallback<Integer, Integer, Throwable>)response -> {
@@ -141,7 +141,7 @@ Best practice is that you always be consistent in the exception type and try not
 });
 ```
 
-Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`. You may also need to cast your promise with *raw and unchecked* `(Promise)` type if your promise is incompatible with `Throwable`:
+Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`. You may also need to cast your promise to *raw and unchecked* `(Promise)` type if your promise is incompatible with `Throwable`:
 
 ```java
 @SuppressWarnings({ "unchecked", "rawtypes" })
