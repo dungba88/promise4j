@@ -1,7 +1,7 @@
 # promise4j
 
 [![License](https://img.shields.io/github/license/dungba88/promise4j.svg?maxAge=2592000)](LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/org.dungba/joo-promise4j.svg?maxAge=2592000)](http://mvnrepository.com/artifact/org.dungba/joo-promise4j)
+[![Maven Central](https://img.shields.io/maven-central/v/org.dungba/joo-promise4j.svg?maxAge=604800)](http://mvnrepository.com/artifact/org.dungba/joo-promise4j)
 [![Build Status](https://travis-ci.org/dungba88/promise4j.svg?branch=master)](https://travis-ci.org/dungba88/promise4j)
 [![Coverage Status](https://coveralls.io/repos/github/dungba88/promise4j/badge.svg?branch=master)](https://coveralls.io/github/dungba88/promise4j?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9ed4ade5bed42c5a711db92b5288ffc)](https://www.codacy.com/app/dungba88/promise4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dungba88/promise4j&amp;utm_campaign=Badge_Grade)
@@ -24,7 +24,7 @@ Install with Maven:
 <dependency>
     <groupId>org.dungba</groupId>
     <artifactId>joo-promise4j</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -64,23 +64,23 @@ The done callback will be called when the provider call `resolve()` with a respo
 You can also chain the processing via `pipeDone()` and `pipeFail`:
 
 ```java
-deferred.promise().pipeDone(response -> {   // PIPE 1
+deferred.promise().pipeDone(response -> {
     // this will be called only when the original deferred resolved successfully
     // it will create new pipe
     return somePromise;
-}).pipeDone(response -> {   // PIPE 2
-    // this will be called only when the PIPE 1 resolve successfully
+}).pipeDone(response -> {
+    // this will be called only when the preceding executed pipe resolve successfully
     // it will create new pipe
     return somePromise;
 }).pipeFail(ex -> { // PIPE 3
-    // this will be called only when the PIPE 2 is rejected
+    // this will be called only when the preceding executed pipe is rejected
     // it will create new pipe
     return somePromise;
 }).done(response -> {
-    // this will be called only when the PIPE 3 resolve successfully
+    // this will be called only when the preceding executed pipe resolve successfully
     // it will not create any pipe
 }).fail(response -> {
-    // this will be called only when the PIPE 3 is rejected
+    // this will be called only when the preceding executed pipe is rejected
     // it will not create any pipe
 });
 ```
