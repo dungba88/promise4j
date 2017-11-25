@@ -141,7 +141,12 @@ Best practice is that you always be consistent in the exception type and try not
 });
 ```
 
-Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`.
+Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`. You may also need to cast your promise with *raw and unchecked* `(Promise)` type if your promise is incompatible with `Throwable`:
+
+```java
+@SuppressWarnings({ "unchecked", "rawtypes" })
+return (Promise)someIncompatiblePromise;
+```
 
 ## simple versions
 
