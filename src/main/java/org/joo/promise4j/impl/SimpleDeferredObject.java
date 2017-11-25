@@ -52,13 +52,13 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
-    private void triggerDone(final DoneCallback<D> callback, D resolve) {
+    private void triggerDone(final DoneCallback<D> callback, final D resolve) {
         if (callback != null) {
             callback.onDone(resolve);
         }
     }
 
-    private void triggerFail(final FailCallback<F> callback, F reject) {
+    private void triggerFail(final FailCallback<F> callback, final F reject) {
         if (callback != null) {
             callback.onFail(reject);
         }

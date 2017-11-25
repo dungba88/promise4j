@@ -67,13 +67,13 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
         return this;
     }
 
-    private void triggerDone(final DoneCallback<D> callback, D resolve) {
+    private void triggerDone(final DoneCallback<D> callback, final D resolve) {
         if (callback != null) {
             callback.onDone(resolve);
         }
     }
 
-    private void triggerFail(final FailCallback<F> callback, F reject) {
+    private void triggerFail(final FailCallback<F> callback, final F reject) {
         if (callback != null) {
             callback.onFail(reject);
         }

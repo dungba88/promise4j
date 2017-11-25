@@ -7,7 +7,7 @@ import org.joo.promise4j.Promise;
 public class PipedPromise<D, F extends Throwable, D_OUT, F_OUT extends Throwable> extends CompletableDeferredObject<D_OUT, F_OUT> {
     
     @SuppressWarnings("unchecked")
-    public PipedPromise(Promise<D, F> promise, PipeDoneCallback<D, D_OUT, F_OUT> doneCallback, PipeFailureCallback<F, D_OUT, F_OUT> failCallback) {
+    public PipedPromise(final Promise<D, F> promise, final PipeDoneCallback<D, D_OUT, F_OUT> doneCallback, final PipeFailureCallback<F, D_OUT, F_OUT> failCallback) {
         promise.done(response -> {
             if (doneCallback != null) {
                 try {
@@ -29,7 +29,7 @@ public class PipedPromise<D, F extends Throwable, D_OUT, F_OUT extends Throwable
         });
     }
 
-    private void pipe(Promise<D_OUT, F_OUT> promise) {
+    private void pipe(final Promise<D_OUT, F_OUT> promise) {
         promise.done(response -> {
             resolve(response);
         }).fail(ex -> {
