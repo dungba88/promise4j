@@ -44,7 +44,7 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
     }
 
     @Override
-    public Promise<D, F> done(DoneCallback<D> callback) {
+    public Promise<D, F> done(final DoneCallback<D> callback) {
         synchronized (this) {
             if (isResolved()) {
                 triggerDone(callback, result);
@@ -56,7 +56,7 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
     }
 
     @Override
-    public Promise<D, F> fail(FailCallback<F> callback) {
+    public Promise<D, F> fail(final FailCallback<F> callback) {
         synchronized (this) {
             if (isRejected()) {
                 triggerFail(callback, failedCause);
@@ -67,13 +67,13 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
         return this;
     }
 
-    private void triggerDone(DoneCallback<D> callback, D resolve) {
+    private void triggerDone(final DoneCallback<D> callback, D resolve) {
         if (callback != null) {
             callback.onDone(resolve);
         }
     }
 
-    private void triggerFail(FailCallback<F> callback, F reject) {
+    private void triggerFail(final FailCallback<F> callback, F reject) {
         if (callback != null) {
             callback.onFail(reject);
         }

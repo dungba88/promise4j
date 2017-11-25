@@ -49,13 +49,13 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
         return this;
     }
 
-    private void onComplete(D result) {
+    private void onComplete(final D result) {
         if (doneCallback != null && alert.compareAndSet(false, true)) {
             doneCallback.onDone(result);
         }
     }
 
-    private void onFail(F failedCause) {
+    private void onFail(final F failedCause) {
         if (failureCallback != null && alert.compareAndSet(false, true)) {
             failureCallback.onFail(failedCause);
         }
@@ -67,7 +67,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     }
 
     @Override
-    public Promise<D, F> done(DoneCallback<D> callback) {
+    public Promise<D, F> done(final DoneCallback<D> callback) {
         doneCallback = callback;
         if (status == DeferredStatus.RESOLVED && alert.compareAndSet(false, true))
             callback.onDone(result);
@@ -75,7 +75,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     }
 
     @Override
-    public Promise<D, F> fail(FailCallback<F> callback) {
+    public Promise<D, F> fail(final FailCallback<F> callback) {
         this.failureCallback = callback;
         if (status == DeferredStatus.REJECTED && alert.compareAndSet(false, true))
             callback.onFail(failedCause);

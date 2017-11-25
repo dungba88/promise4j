@@ -18,7 +18,7 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
 
     private FailCallback<F> failCallback;
 
-    public SimpleDeferredObject(DoneCallback<D> doneCallback, FailCallback<F> failCallback) {
+    public SimpleDeferredObject(final DoneCallback<D> doneCallback, final FailCallback<F> failCallback) {
         this.doneCallback = doneCallback;
         this.failCallback = failCallback;
     }
@@ -43,22 +43,22 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     }
 
     @Override
-    public Promise<D, F> done(DoneCallback<D> callback) {
+    public Promise<D, F> done(final DoneCallback<D> callback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
     @Override
-    public Promise<D, F> fail(FailCallback<F> callback) {
+    public Promise<D, F> fail(final FailCallback<F> callback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
-    private void triggerDone(DoneCallback<D> callback, D resolve) {
+    private void triggerDone(final DoneCallback<D> callback, D resolve) {
         if (callback != null) {
             callback.onDone(resolve);
         }
     }
 
-    private void triggerFail(FailCallback<F> callback, F reject) {
+    private void triggerFail(final FailCallback<F> callback, F reject) {
         if (callback != null) {
             callback.onFail(reject);
         }
@@ -73,24 +73,26 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     }
 
     @Override
-    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> pipeDone(PipeDoneCallback<D, D_OUT, F_OUT> callback) {
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> pipeDone(
+            final PipeDoneCallback<D, D_OUT, F_OUT> callback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
     @Override
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> pipeFail(
-            PipeFailureCallback<F, D_OUT, F_OUT> failCallback) {
+            final PipeFailureCallback<F, D_OUT, F_OUT> failCallback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
     @Override
-    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(FilteredDoneCallback<D, D_OUT> callback) {
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(
+            final FilteredDoneCallback<D, D_OUT> callback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
     @Override
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterFail(
-            FilteredFailureCallback<F, F_OUT> failCallback) {
+            final FilteredFailureCallback<F, F_OUT> failCallback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 }

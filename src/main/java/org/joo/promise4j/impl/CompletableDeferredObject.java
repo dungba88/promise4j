@@ -16,14 +16,14 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
     }
     
     @Override
-    public Promise<D, F> done(DoneCallback<D> callback) {
+    public Promise<D, F> done(final DoneCallback<D> callback) {
         future.thenAccept((response) -> callback.onDone(response));
         return this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Promise<D, F> fail(FailCallback<F> callback) {
+    public Promise<D, F> fail(final FailCallback<F> callback) {
         future.exceptionally(ex -> {
             callback.onFail((F) ex);
             return null;
@@ -32,13 +32,13 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
     }
 
     @Override
-    public Deferred<D, F> resolve(D result) {
+    public Deferred<D, F> resolve(final D result) {
         future.complete(result);
         return this;
     }
 
     @Override
-    public Deferred<D, F> reject(F failedCause) {
+    public Deferred<D, F> reject(final F failedCause) {
         future.completeExceptionally(failedCause);
         return this;
     }
