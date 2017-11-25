@@ -61,29 +61,53 @@ deferred.promise().done(response -> {
 
 The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called.
 
-You can also chain the processing via `pipeDone()` and `pipeFail`:
+## pipe and filter
+
+You can also chain the processing via `pipeDone()`, `pipeFail`, `filterDone()` and `filterFail()`:
 
 ```java
 deferred.promise().pipeDone(response -> {
     // this will be called only when the original deferred resolved successfully
-    // it will create new pipe
+    // it will create new stage
     return somePromise;
 }).pipeDone(response -> {
-    // this will be called only when the preceding executed pipe resolve successfully
-    // it will create new pipe
+    // this will be called only when the preceding executed stage resolve successfully
+    // it will create new stage
     return somePromise;
-}).pipeFail(ex -> { // PIPE 3
-    // this will be called only when the preceding executed pipe is rejected
-    // it will create new pipe
+}).filterDone(response -> {
+    // this will be called only when the preceeding executed stage resolve successfully
+    // it will create new stage
+    return someResponse;
+}).pipeFail(ex -> {
+    // this will be called only when the preceding executed stage is rejected
+    // it will create new stage
     return somePromise;
+}).filterFail(ex -> {
+    // this will be called only when the preceding executed stage is rejected
+    // it will create new stage
+    return someException;
 }).done(response -> {
-    // this will be called only when the preceding executed pipe resolve successfully
-    // it will not create any pipe
+    // this will be called only when the preceding executed stage resolve successfully
+    // it will not create any stage
 }).fail(response -> {
-    // this will be called only when the preceding executed pipe is rejected
-    // it will not create any pipe
-});
+    // this will be called only when the preceding executed stage is rejected
+    // it will not create any stage
+}).pipeDone(... // do it all again if you wish);
 ```
+
+*Note on exception type*
+
+If any exception is thrown while executing the preceding stage, that stage is considered rejected with the thrown exception as cause. So be careful with the type of the exception you received, it might be the type of the preceding stage's promise failPipe/failFilter or it also can be the type of the thrown exception. For example:
+
+...pipeDone(response -> {
+    if (...)    // some condition that raise the exception
+        throw new IllegalArgumentException();
+    return new SimpleFailurePromise(new UnsupportedOperationException());
+}).pipeFail(ex -> {
+    // ex can be of type IllegalArgumentException or UnsupportedOperationException
+});
+
+Best practice is that you always be consistent in the exception type and try not to throw exception.
 
 ## simple versions
 
