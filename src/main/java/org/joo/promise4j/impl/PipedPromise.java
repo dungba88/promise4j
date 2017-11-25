@@ -9,10 +9,22 @@ public class PipedPromise<D, F extends Throwable, D_OUT, F_OUT extends Throwable
     @SuppressWarnings("unchecked")
     public PipedPromise(Promise<D, F> promise, PipeDoneCallback<D, D_OUT, F_OUT> doneCallback, PipeFailureCallback<F, D_OUT, F_OUT> failCallback) {
         promise.done(response -> {
-            if (doneCallback != null) pipe(doneCallback.onDone(response));
+            if (doneCallback != null) {
+                try {
+                    pipe(doneCallback.onDone(response));
+                } catch (Throwable ex) {
+                    reject((F_OUT) ex);
+                }
+            }
             else resolve((D_OUT) response);
         }).fail(ex -> {
-            if (failCallback != null) pipe(failCallback.onFail(ex));
+            if (failCallback != null) {
+                try {
+                    pipe(failCallback.onFail(ex));
+                } catch (Throwable cause) {
+                    reject((F_OUT) cause);
+                }
+            }
             else reject((F_OUT) ex);
         });
     }

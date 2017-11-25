@@ -4,6 +4,8 @@ import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
+import org.joo.promise4j.FilteredDoneCallback;
+import org.joo.promise4j.FilteredFailureCallback;
 import org.joo.promise4j.PipeDoneCallback;
 import org.joo.promise4j.PipeFailureCallback;
 import org.joo.promise4j.Promise;
@@ -78,6 +80,17 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     @Override
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> pipeFail(
             PipeFailureCallback<F, D_OUT, F_OUT> failCallback) {
+        throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
+    }
+
+    @Override
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(FilteredDoneCallback<D, D_OUT> callback) {
+        throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
+    }
+
+    @Override
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterFail(
+            FilteredFailureCallback<F, F_OUT> failCallback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 }

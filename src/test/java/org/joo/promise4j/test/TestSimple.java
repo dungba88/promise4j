@@ -78,6 +78,25 @@ public class TestSimple {
     }
     
     @Test
+    public void testSimpleFilter() {
+        Deferred<Object, Throwable> deferred = new SimpleDeferredObject<>(response -> {
+        }, ex -> {
+        });
+        try {
+            deferred.promise().filterDone(null);
+            Assert.fail("must fail");
+        } catch (UnsupportedOperationException ex) {
+            Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        }
+        try {
+            deferred.promise().filterFail(null);
+            Assert.fail("must fail");
+        } catch (UnsupportedOperationException ex) {
+            Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        }
+    }
+    
+    @Test
     public void testSimpleDone() {
         Promise<Object, Throwable> promise = new SimpleDonePromise<Object, Throwable>(1);
         promise.done(response -> {

@@ -9,4 +9,8 @@ public interface Promise<D, F extends Throwable> {
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> pipeDone(PipeDoneCallback<D, D_OUT, F_OUT> callback);
     
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> pipeFail(PipeFailureCallback<F, D_OUT, F_OUT> failCallback);
+    
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(FilteredDoneCallback<D, D_OUT> callback);
+    
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterFail(FilteredFailureCallback<F, F_OUT> failCallback);
 }

@@ -9,7 +9,6 @@ import org.joo.promise4j.Deferred;
 import org.joo.promise4j.impl.AsyncDeferredObject;
 import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.SimpleDonePromise;
-import org.joo.promise4j.impl.SimpleFailurePromise;
 import org.joo.promise4j.impl.SyncDeferredObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,28 +17,28 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class TestPipeline {
+public class TestFilter {
     
     private volatile boolean result = false;
     
     private Supplier<Deferred<Integer, Throwable>> deferredSupplier;
     
-    public TestPipeline(Supplier<Deferred<Integer, Throwable>> deferredSupplier) {
+    public TestFilter(Supplier<Deferred<Integer, Throwable>> deferredSupplier) {
         this.deferredSupplier = deferredSupplier;
     }
     
     @Test
-    public void testDonePipelineException() {
+    public void testDoneFilterException() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
         
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
-        }).pipeDone(response -> {
-            return new SimpleDonePromise<>(response + 1);
-        }).pipeDone(response -> {
-            return new SimpleDonePromise<>(response + "");
+        }).filterDone(response -> {
+            return response + 1;
+        }).filterDone(response -> {
+            return response + "";
         }).done(response -> {
             latch.countDown();
         }).fail(ex -> {
@@ -68,10 +67,10 @@ public class TestPipeline {
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
-        }).pipeDone(response -> {
-            return new SimpleDonePromise<>(response + 1);
-        }).pipeDone(response -> {
-            return new SimpleDonePromise<>(response + "");
+        }).filterDone(response -> {
+            return response + 1;
+        }).filterDone(response -> {
+            return response + "";
         }).done(response -> {
             if (response.equals("2"))
                 result = true;
@@ -99,10 +98,10 @@ public class TestPipeline {
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
-        }).pipeFail(ex -> {
-            return new SimpleFailurePromise<>(new IllegalArgumentException());
-        }).pipeDone(response -> {
-            return new SimpleDonePromise<>((int)response + 1);
+        }).filterFail(ex -> {
+            return new IllegalArgumentException();
+        }).filterDone(response -> {
+            return (int)response + 1;
         }).done(response -> {
             if (response == 2)
                 result = true;
@@ -123,68 +122,7 @@ public class TestPipeline {
     }
     
     @Test
-    public void testDonePipelineMixed() {
-        CountDownLatch latch = new CountDownLatch(1);
-        result = false;
-        
-        final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
-        deferred.promise().done(response -> {
-            Assert.assertEquals(1, response.intValue());
-        }).pipeDone(response -> {
-            return new SimpleFailurePromise<>(new IllegalArgumentException());
-        }).pipeDone(response -> {
-            // should not called here
-            return new SimpleDonePromise<>(1);
-        }).done(response -> {
-            latch.countDown();
-        }).fail(ex -> {
-            if (ex instanceof IllegalArgumentException)
-                result = true;
-            latch.countDown();
-        });
-        
-        deferred.resolve(1);
-        
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Assert.fail(e.getMessage());
-        }
-        
-        Assert.assertTrue(result);
-    }
-    
-    @Test
-    public void testFailPipelineMixed() {
-        CountDownLatch latch = new CountDownLatch(1);
-        result = false;
-        
-        final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
-        deferred.promise().done(response -> {
-            Assert.assertEquals(1, response.intValue());
-        }).pipeFail(ex -> {
-            return new SimpleDonePromise<>(3);
-        }).done(response -> {
-            if (response == 3)
-                result = true;
-            latch.countDown();
-        }).fail(ex -> {
-            latch.countDown();
-        });
-        
-        deferred.reject(new NullPointerException());
-        
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Assert.fail(e.getMessage());
-        }
-        
-        Assert.assertTrue(result);
-    }
-    
-    @Test
-    public void testPipelineThrowException() {
+    public void testFilterThrowException() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
         
@@ -193,19 +131,21 @@ public class TestPipeline {
             Assert.assertEquals(1, response.intValue());
         }).pipeDone(response -> {
             return new SimpleDonePromise<>(response + 1);
-        }).pipeDone(response -> {
+        }).filterDone(response -> {
             throw new IllegalArgumentException();
-        }).pipeFail(ex -> {
+        }).filterFail(ex -> {
             if (ex instanceof IllegalArgumentException)
-                return new SimpleFailurePromise<>(new IllegalStateException());
+                return new IllegalStateException();
             return null;
-        }).pipeFail(ex -> {
+        }).filterFail(ex -> {
             if (ex instanceof IllegalStateException)
                 throw new NullPointerException();
             return null;
         }).done(response -> {
+            // should not called here
             latch.countDown();
         }).fail(ex -> {
+            // should not called here
             if (ex instanceof NullPointerException)
                 result = true;
             latch.countDown();
@@ -221,7 +161,7 @@ public class TestPipeline {
         
         Assert.assertTrue(result);
     }
-
+    
     @Parameters
     public static List<Object[]> data() {
         List<Object[]> list = new ArrayList<>();
