@@ -99,6 +99,7 @@ deferred.promise().pipeDone(response -> {
 
 If any exception is thrown while executing the preceding stage, that stage is considered rejected with the thrown exception as cause. So be careful with the type of the exception you received, it might be the type of the preceding stage's promise failPipe/failFilter or it also can be the type of the thrown exception. For example:
 
+```java
 ...pipeDone(response -> {
     if (...)    // some condition that raise the exception
         throw new IllegalArgumentException();
@@ -106,6 +107,7 @@ If any exception is thrown while executing the preceding stage, that stage is co
 }).pipeFail(ex -> {
     // ex can be of type IllegalArgumentException or UnsupportedOperationException
 });
+```
 
 Best practice is that you always be consistent in the exception type and try not to throw exception.
 
