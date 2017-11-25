@@ -25,7 +25,7 @@ Install with Maven:
 <dependency>
     <groupId>org.dungba</groupId>
     <artifactId>joo-promise4j</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
