@@ -14,6 +14,10 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
     public CompletableDeferredObject() {
         this.future = new CompletableFuture<>();
     }
+    
+    public CompletableDeferredObject(final CompletableFuture<D> future) {
+        this.future = future;
+    }
 
     @Override
     public Promise<D, F> done(final DoneCallback<D> callback) {
