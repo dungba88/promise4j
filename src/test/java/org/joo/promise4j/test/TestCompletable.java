@@ -1,5 +1,6 @@
 package org.joo.promise4j.test;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,6 +12,28 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestCompletable {
+
+    private boolean result = false;
+    
+    @Test
+    public void testExternalFuture() {
+        result = false;
+        CountDownLatch latch = new CountDownLatch(1);
+        CompletableFuture<Object> future = new CompletableFuture<>();
+        final Deferred<Object, Throwable> deferred = new CompletableDeferredObject<>(future);
+        deferred.promise().done(response -> {
+            if (response.equals(1))
+                result = true;
+            latch.countDown();
+        });
+        future.complete(1);
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        Assert.assertTrue(result);
+    }
     
     @Test
     public void testMultiCallback() {
