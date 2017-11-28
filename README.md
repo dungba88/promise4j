@@ -120,7 +120,7 @@ Best practice is that you always be consistent in the exception type and try not
         if (...)    // some condition that raise the exception
             throw new IllegalArgumentException();
         return new SimpleFailurePromise(new UnsupportedOperationException());
-    } catch (Throwable ex) {
+    } catch (Exception ex) {
         // convert ex to correct exception type
         // this can be done by using ex as the cause of the expected exception
         // e.g: expectedException = new UnsupportedOperationException(ex);
@@ -131,17 +131,17 @@ Best practice is that you always be consistent in the exception type and try not
 });
 ```
 
-2. Explicitly use a PipeDoneCallback<ANY_TYPE, ANY_TYPE, Throwable> or PipeFailureCallback<ANY_TYPE, ANY_TYPE, Throwable> to cover all exception types.
+2. Explicitly use a PipeDoneCallback<ANY_TYPE, ANY_TYPE, Exception> or PipeFailureCallback<ANY_TYPE, ANY_TYPE, Exception> to cover all exception types.
 
 ```java
-...pipeDone((PipeDoneCallback<Integer, Integer, Throwable>)response -> {
-    // return promise of Throwable type
+...pipeDone((PipeDoneCallback<Integer, Integer, Exception>)response -> {
+    // return promise of Exception type
 }).pipeFail(ex -> {
     // ex can be of any type here
 });
 ```
 
-Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`. You may also need to cast your promise to *raw and unchecked* `(Promise)` type if your promise is incompatible with `Throwable`:
+Although with the second approach you don't have to add a try-catch block, it tends to be more error-prone since you have no way of knowing exception type beforehand in the `failCallback`. You may also need to cast your promise to *raw and unchecked* `(Promise)` type if your promise is incompatible with `Exception`:
 
 ```java
 @SuppressWarnings({ "unchecked", "rawtypes" })
