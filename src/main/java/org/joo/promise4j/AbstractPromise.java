@@ -1,10 +1,7 @@
-package org.joo.promise4j.impl;
+package org.joo.promise4j;
 
-import org.joo.promise4j.FilteredDoneCallback;
-import org.joo.promise4j.FilteredFailureCallback;
-import org.joo.promise4j.PipeDoneCallback;
-import org.joo.promise4j.PipeFailureCallback;
-import org.joo.promise4j.Promise;
+import org.joo.promise4j.impl.FilteredPromise;
+import org.joo.promise4j.impl.PipedPromise;
 
 public abstract class AbstractPromise<D, F extends Throwable> implements Promise<D, F> {
 

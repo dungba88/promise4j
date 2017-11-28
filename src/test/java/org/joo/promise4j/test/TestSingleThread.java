@@ -2,9 +2,11 @@ package org.joo.promise4j.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.Deferred;
+import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.impl.AsyncDeferredObject;
 import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.SyncDeferredObject;
@@ -16,7 +18,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TestSingleThread {
-
+    
     private Supplier<Deferred<Object, Throwable>> deferredSupplier;
     
     public TestSingleThread(Supplier<Deferred<Object, Throwable>> deferredSupplier) {
@@ -25,57 +27,97 @@ public class TestSingleThread {
 
     @Test
     public void testResolveBefore() {
+        AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
         deferred.resolve(1);
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response);
+            counter.incrementAndGet();
         }).fail(ex -> {
             Assert.fail(ex.getMessage());
+        }).always((status, response, ex) -> {
+            Assert.assertEquals(DeferredStatus.RESOLVED, status);
+            Assert.assertNull(ex);
+            Assert.assertEquals(1, response);
+            counter.incrementAndGet();
         });
+        Assert.assertEquals(2, counter.get());
     }
 
     @Test
     public void testResolveAfter() {
+        AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response);
+            counter.incrementAndGet();
         }).fail(ex -> {
             Assert.fail(ex.getMessage());
+        }).always((status, response, ex) -> {
+            Assert.assertEquals(DeferredStatus.RESOLVED, status);
+            Assert.assertNull(ex);
+            Assert.assertEquals(1, response);
+            counter.incrementAndGet();
         });
         deferred.resolve(1);
+        Assert.assertEquals(2, counter.get());
     }
 
     @Test
     public void testRejectBefore() {
+        AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
         deferred.reject(new UnsupportedOperationException());
         deferred.promise().done(response -> {
             Assert.fail("Cannot be resolved");
         }).fail(ex -> {
             Assert.assertTrue(ex instanceof UnsupportedOperationException);
+            counter.incrementAndGet();
+        }).always((status, response, ex) -> {
+            Assert.assertEquals(DeferredStatus.REJECTED, status);
+            Assert.assertNull(response);
+            Assert.assertTrue(ex instanceof UnsupportedOperationException);
+            counter.incrementAndGet();
         });
+        Assert.assertEquals(2, counter.get());
     }
 
     @Test
     public void testRejectAfter() {
+        AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.fail("Cannot be resolved");
         }).fail(ex -> {
             Assert.assertTrue(ex instanceof UnsupportedOperationException);
+            counter.incrementAndGet();
+        }).always((status, response, ex) -> {
+            Assert.assertEquals(DeferredStatus.REJECTED, status);
+            Assert.assertNull(response);
+            Assert.assertTrue(ex instanceof UnsupportedOperationException);
+            counter.incrementAndGet();
         });
         deferred.reject(new UnsupportedOperationException());
+        Assert.assertEquals(2, counter.get());
     }
 
     @Test
     public void testResolveTwice() {
+        AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response);
+            counter.incrementAndGet();
         }).fail(ex -> {
             Assert.fail(ex.getMessage());
+        }).always((status, response, ex) -> {
+            Assert.assertEquals(DeferredStatus.RESOLVED, status);
+            Assert.assertNull(ex);
+            Assert.assertEquals(1, response);
+            counter.incrementAndGet();
         });
         deferred.resolve(1);
+        Assert.assertEquals(2, counter.get());
         try {
             deferred.resolve(1);
         } catch (IllegalStateException ex) {
@@ -85,13 +127,21 @@ public class TestSingleThread {
 
     @Test
     public void testRejectTwice() {
+        AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.fail("Cannot be resolved");
         }).fail(ex -> {
             Assert.assertTrue(ex instanceof UnsupportedOperationException);
+            counter.incrementAndGet();
+        }).always((status, response, ex) -> {
+            Assert.assertEquals(DeferredStatus.REJECTED, status);
+            Assert.assertNull(response);
+            Assert.assertTrue(ex instanceof UnsupportedOperationException);
+            counter.incrementAndGet();
         });
         deferred.reject(new UnsupportedOperationException());
+        Assert.assertEquals(2, counter.get());
         try {
             deferred.reject(new UnsupportedOperationException());
         } catch (IllegalStateException ex) {

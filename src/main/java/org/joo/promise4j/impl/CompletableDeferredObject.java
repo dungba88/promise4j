@@ -2,7 +2,10 @@ package org.joo.promise4j.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.joo.promise4j.AbstractPromise;
+import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
+import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
@@ -14,7 +17,7 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
     public CompletableDeferredObject() {
         this.future = new CompletableFuture<>();
     }
-    
+
     public CompletableDeferredObject(final CompletableFuture<D> future) {
         this.future = future;
     }
@@ -31,6 +34,15 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
         future.exceptionally(ex -> {
             callback.onFail((F) ex);
             return null;
+        });
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Promise<D, F> always(AlwaysCallback<D, F> callback) {
+        future.whenComplete((result, cause) -> {
+            callback.onAlways(cause != null ? DeferredStatus.REJECTED : DeferredStatus.RESOLVED, result, (F) cause);
         });
         return this;
     }

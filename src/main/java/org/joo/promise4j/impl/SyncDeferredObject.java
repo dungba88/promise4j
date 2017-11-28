@@ -1,5 +1,7 @@
 package org.joo.promise4j.impl;
 
+import org.joo.promise4j.AbstractPromise;
+import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
@@ -12,7 +14,9 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
 
     private F failedCause;
 
-    private volatile DeferredStatus status;
+    private DeferredStatus status;
+
+    private AlwaysCallback<D, F> alwaysCallback;
 
     private DoneCallback<D> doneCallback;
 
@@ -27,6 +31,7 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
             this.status = DeferredStatus.RESOLVED;
             this.result = resolve;
             triggerDone(doneCallback, resolve);
+            triggerAlways(alwaysCallback, resolve, null);
         }
         return this;
     }
@@ -36,9 +41,11 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
         synchronized (this) {
             if (!isPending())
                 throw new IllegalStateException("Deferred is already resolved or rejected");
+
             this.status = DeferredStatus.REJECTED;
             this.failedCause = reject;
             triggerFail(failCallback, reject);
+            triggerAlways(alwaysCallback, null, reject);
         }
         return this;
     }
@@ -46,11 +53,10 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
     @Override
     public Promise<D, F> done(final DoneCallback<D> callback) {
         synchronized (this) {
-            if (isResolved()) {
+            if (isResolved())
                 triggerDone(callback, result);
-            } else {
+            else
                 doneCallback = callback;
-            }
         }
         return this;
     }
@@ -58,25 +64,40 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
     @Override
     public Promise<D, F> fail(final FailCallback<F> callback) {
         synchronized (this) {
-            if (isRejected()) {
+            if (isRejected())
                 triggerFail(callback, failedCause);
-            } else {
+            else
                 failCallback = callback;
-            }
+        }
+        return this;
+    }
+
+    @Override
+    public Promise<D, F> always(AlwaysCallback<D, F> callback) {
+        synchronized (this) {
+            if (isRejected())
+                triggerAlways(callback, null, failedCause);
+            else if (isResolved())
+                triggerAlways(callback, result, null);
+            else
+                alwaysCallback = callback;
         }
         return this;
     }
 
     private void triggerDone(final DoneCallback<D> callback, final D resolve) {
-        if (callback != null) {
+        if (callback != null)
             callback.onDone(resolve);
-        }
     }
 
     private void triggerFail(final FailCallback<F> callback, final F reject) {
-        if (callback != null) {
+        if (callback != null)
             callback.onFail(reject);
-        }
+    }
+
+    private void triggerAlways(final AlwaysCallback<D, F> callback, final D resolve, final F reject) {
+        if (callback != null)
+            callback.onAlways(status, resolve, reject);
     }
 
     @Override

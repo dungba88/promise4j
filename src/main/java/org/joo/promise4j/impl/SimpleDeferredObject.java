@@ -1,5 +1,6 @@
 package org.joo.promise4j.impl;
 
+import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
@@ -14,11 +15,19 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
 
     private DeferredStatus status;
 
+    private AlwaysCallback<D, F> alwaysCallback;
+
     private DoneCallback<D> doneCallback;
 
     private FailCallback<F> failCallback;
-
+    
     public SimpleDeferredObject(final DoneCallback<D> doneCallback, final FailCallback<F> failCallback) {
+        this(doneCallback, failCallback, null);
+    }
+
+    public SimpleDeferredObject(final DoneCallback<D> doneCallback, final FailCallback<F> failCallback,
+            final AlwaysCallback<D, F> alwaysCallback) {
+        this.alwaysCallback = alwaysCallback;
         this.doneCallback = doneCallback;
         this.failCallback = failCallback;
     }
@@ -30,6 +39,7 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
 
         this.status = DeferredStatus.RESOLVED;
         triggerDone(doneCallback, resolve);
+        triggerAlways(alwaysCallback, resolve, null);
         return this;
     }
 
@@ -39,6 +49,26 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
             throw new IllegalStateException("Deferred is already resolved or rejected");
         this.status = DeferredStatus.REJECTED;
         triggerFail(failCallback, reject);
+        triggerAlways(alwaysCallback, null, reject);
+        return this;
+    }
+
+    private void triggerDone(final DoneCallback<D> callback, final D resolve) {
+        if (callback != null)
+            callback.onDone(resolve);
+    }
+
+    private void triggerFail(final FailCallback<F> callback, final F reject) {
+        if (callback != null)
+            callback.onFail(reject);
+    }
+
+    public boolean isPending() {
+        return status == null;
+    }
+
+    @Override
+    public Promise<D, F> promise() {
         return this;
     }
 
@@ -52,24 +82,14 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
-    private void triggerDone(final DoneCallback<D> callback, final D resolve) {
-        if (callback != null) {
-            callback.onDone(resolve);
-        }
+    @Override
+    public Promise<D, F> always(AlwaysCallback<D, F> callback) {
+        throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 
-    private void triggerFail(final FailCallback<F> callback, final F reject) {
-        if (callback != null) {
-            callback.onFail(reject);
-        }
-    }
-
-    public Promise<D, F> promise() {
-        return this;
-    }
-
-    public boolean isPending() {
-        return status == null;
+    private void triggerAlways(AlwaysCallback<D, F> callback, D resolve, F reject) {
+        if (callback != null)
+            callback.onAlways(status, resolve, reject);
     }
 
     @Override

@@ -2,6 +2,8 @@ package org.joo.promise4j.impl;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.joo.promise4j.AbstractPromise;
+import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
@@ -13,6 +15,8 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     private D result;
 
     private F failedCause;
+    
+    private volatile AlwaysCallback<D, F> alwaysCallback;
 
     private volatile DoneCallback<D> doneCallback;
 
@@ -23,10 +27,13 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     private AtomicBoolean done;
 
     private AtomicBoolean alert;
+    
+    private AtomicBoolean alwaysAlert;
 
     public AsyncDeferredObject() {
         this.done = new AtomicBoolean(false);
         this.alert = new AtomicBoolean(false);
+        this.alwaysAlert = new AtomicBoolean(false);
     }
 
     @Override
@@ -50,19 +57,29 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     }
 
     private void onComplete(final D result) {
-        if (doneCallback != null && alert.compareAndSet(false, true)) {
+        if (doneCallback != null && alert.compareAndSet(false, true))
             doneCallback.onDone(result);
-        }
+        if (alwaysCallback != null && alwaysAlert.compareAndSet(false, true))
+            alwaysCallback.onAlways(DeferredStatus.RESOLVED, result, null);
     }
 
     private void onFail(final F failedCause) {
-        if (failureCallback != null && alert.compareAndSet(false, true)) {
+        if (failureCallback != null && alert.compareAndSet(false, true))
             failureCallback.onFail(failedCause);
-        }
+        if (alwaysCallback != null && alwaysAlert.compareAndSet(false, true))
+            alwaysCallback.onAlways(DeferredStatus.REJECTED, null, failedCause);
     }
 
     @Override
     public Promise<D, F> promise() {
+        return this;
+    }
+    
+    @Override
+    public Promise<D, F> always(AlwaysCallback<D, F> callback) {
+        alwaysCallback = callback;
+        if (status != null && alwaysAlert.compareAndSet(false, true))
+            callback.onAlways(status, result, failedCause);
         return this;
     }
 
