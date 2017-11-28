@@ -150,6 +150,22 @@ Although with the second approach you don't have to add a try-catch block, it te
 return (Promise)someIncompatiblePromise;
 ```
 
+## joined promise
+
+Since `1.1.0`, you can make use of `JoinedPromise` to join multiple promises into a single one.
+
+```java
+promise = JoinedPromise.from(promise1, promise2, promise3);
+promise.done(...).fail(...);
+```
+
+The conditions for callbacks are as below:
+- The joined promise will be considered fulfilled if and only if *all* child promises are resolved successfully
+- The joined promise will be considered rejected if *at least one* child promise is rejected
+- The joined promise will be considered completed if *all* child promises are either resolved or rejected
+
+The fail callback will be triggered only once for the first rejected child promise. Any other failure are ignore.
+
 ## simple versions
 
 Sometimes, it's not necessary to use `AsyncDeferredObject` or `CompletableDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
