@@ -10,7 +10,7 @@ Simple deferred/promise framework for Java. It supplements the asynchronous capa
 
 ## what is promise
 
-A promise is...well, a promise. Let say you ask somebody to do something for you. He is currently busy, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or when he cannot do it for you. Put it in techincal terms:
+A promise is...well, a promise. Let say you ask somebody to do something for you. He *might* be busy at the moment, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or when he cannot do it for you. Put it in techincal terms:
 
 - The person you asks is called a *deferred object*. A deferred object will give you a *promise*
 - The act of fulfilling the job is called *resolve*
@@ -25,7 +25,7 @@ Install with Maven:
 <dependency>
     <groupId>org.dungba</groupId>
     <artifactId>joo-promise4j</artifactId>
-    <version>1.0.4</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -57,10 +57,12 @@ deferred.promise().done(response -> {
     // do something with the response
 }).fail(ex -> {
     // do something with the exception
+}).always((status, response, ex) -> {   // available since 1.1.0
+    // this will always be called
 });
 ```
 
-The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called.
+The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is done or failed.
 
 ## pipe and filter
 
