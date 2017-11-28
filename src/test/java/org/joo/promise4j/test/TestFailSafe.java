@@ -13,12 +13,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import net.jodah.failsafe.ExecutionContext;
+import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
 public class TestFailSafe {
 
     private volatile boolean result;
-    
+
     @Test
     public void testRetryException() {
         result = false;
@@ -26,10 +27,30 @@ public class TestFailSafe {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
                 .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
-        FailSafePromise.from(this::trySomethingException, executor, retryPolicy).fail(ex -> {
+        FailSafePromise.from(this::trySomethingException, Failsafe.with(retryPolicy).with(executor)).fail(ex -> {
             result = true;
             latch.countDown();
         });
+        try {
+            latch.await(10000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        Assert.assertTrue(result);
+    }
+
+    @Test
+    public void testRetryAfter3Exception() {
+        result = false;
+        CountDownLatch latch = new CountDownLatch(1);
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
+                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+        FailSafePromise.from(this::trySomethingAfter3Exception, Failsafe.with(retryPolicy).with(executor))
+                .done(response -> {
+                    result = true;
+                    latch.countDown();
+                });
         try {
             latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -45,10 +66,11 @@ public class TestFailSafe {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
                 .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
-        FailSafePromise.from(this::trySomethingAlwaysFail, executor, retryPolicy).fail(ex -> {
-            result = true;
-            latch.countDown();
-        });
+        FailSafePromise.fromPromise(this::trySomethingAlwaysFail, Failsafe.with(retryPolicy).with(executor))
+                .fail(ex -> {
+                    result = true;
+                    latch.countDown();
+                });
         try {
             latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -64,10 +86,11 @@ public class TestFailSafe {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
                 .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
-        FailSafePromise.from(this::trySomethingAsync, executor, retryPolicy).done(response -> {
-            result = true;
-            latch.countDown();
-        });
+        FailSafePromise.fromPromise(this::trySomethingAsync, Failsafe.with(retryPolicy).with(executor))
+                .done(response -> {
+                    result = true;
+                    latch.countDown();
+                });
         try {
             latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -83,7 +106,7 @@ public class TestFailSafe {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(UnsupportedOperationException.class)
                 .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
-        FailSafePromise.from(this::trySomethingAsync, executor, retryPolicy).fail(ex -> {
+        FailSafePromise.fromPromise(this::trySomethingAsync, Failsafe.with(retryPolicy).with(executor)).fail(ex -> {
             result = true;
             latch.countDown();
         });
@@ -102,7 +125,7 @@ public class TestFailSafe {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
                 .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(2);
-        FailSafePromise.from(this::trySomethingAsync, executor, retryPolicy).fail(ex -> {
+        FailSafePromise.fromPromise(this::trySomethingAsync, Failsafe.with(retryPolicy).with(executor)).fail(ex -> {
             result = true;
             latch.countDown();
         });
@@ -126,9 +149,17 @@ public class TestFailSafe {
         System.out.println("Retrying");
         return new SimpleFailurePromise<>(new IllegalStateException());
     }
-    
-    private Promise<Integer, Exception> trySomethingException() {
+
+    private Integer trySomethingException() {
         System.out.println("Retrying");
         throw new IllegalStateException();
+    }
+
+    private Integer trySomethingAfter3Exception(ExecutionContext executionContext) {
+        int retries = executionContext.getExecutions();
+        System.out.println("Retries: " + retries);
+        if (retries < 3)
+            throw new IllegalStateException();
+        return 1;
     }
 }

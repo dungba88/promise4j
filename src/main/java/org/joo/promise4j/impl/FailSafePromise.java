@@ -1,17 +1,13 @@
 package org.joo.promise4j.impl;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.joo.promise4j.Promise;
 
 import net.jodah.failsafe.AsyncFailsafe;
-import net.jodah.failsafe.CircuitBreaker;
 import net.jodah.failsafe.ExecutionContext;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
 
 public class FailSafePromise<D, F extends Throwable> extends CompletableDeferredObject<D, F> {
 
@@ -19,47 +15,47 @@ public class FailSafePromise<D, F extends Throwable> extends CompletableDeferred
         super(future);
     }
 
-    public static <D, F extends Throwable> FailSafePromise<D, F> from(Callable<Promise<D, F>> callable,
-            ScheduledExecutorService executor, RetryPolicy retryPolicy) {
-        return from(callable, Failsafe.with(retryPolicy).with(executor));
-    }
-
-    public static <D, F extends Throwable> FailSafePromise<D, F> from(Callable<Promise<D, F>> callable,
-            ScheduledExecutorService executor, RetryPolicy retryPolicy, CircuitBreaker circuitBreaker) {
-        return from(callable, Failsafe.with(retryPolicy).with(circuitBreaker).with(executor));
-    }
-
-    public static <D, F extends Throwable> FailSafePromise<D, F> from(Callable<Promise<D, F>> callable,
+    public static <D, F extends Throwable> FailSafePromise<D, F> from(Supplier<D> supplier,
             AsyncFailsafe<Object> failSafe) {
-        CompletableFuture<D> thisFuture = failSafe.future(() -> {
-            Promise<D, F> promise = callable.call();
-            CompletableFuture<D> future = new CompletableFuture<>();
-            promise.done(future::complete).fail(future::completeExceptionally);
+        CompletableFuture<D> thisFuture = failSafe.future(executionContext -> {
+            CompletableFuture<D> future = CompletableFuture.supplyAsync(supplier);
             return future;
         });
         return new FailSafePromise<>(thisFuture);
     }
 
-    public static <D, F extends Throwable> FailSafePromise<D, F> from(
-            Function<ExecutionContext, Promise<D, F>> callable, ScheduledExecutorService executor,
-            RetryPolicy retryPolicy) {
-        return from(callable, Failsafe.with(retryPolicy).with(executor));
+    public static <D, F extends Throwable> FailSafePromise<D, F> from(Function<ExecutionContext, D> callable,
+            AsyncFailsafe<Object> failSafe) {
+        CompletableFuture<D> thisFuture = failSafe.future(executionContext -> {
+            CompletableFuture<D> future = CompletableFuture.supplyAsync(() -> {
+                return callable.apply(executionContext);
+            });
+            return future;
+        });
+        return new FailSafePromise<>(thisFuture);
     }
 
-    public static <D, F extends Throwable> FailSafePromise<D, F> from(
-            Function<ExecutionContext, Promise<D, F>> callable, ScheduledExecutorService executor,
-            RetryPolicy retryPolicy, CircuitBreaker circuitBreaker) {
-        return from(callable, Failsafe.with(retryPolicy).with(circuitBreaker).with(executor));
+    public static <D, F extends Throwable> FailSafePromise<D, F> fromPromise(Supplier<Promise<D, F>> supplier,
+            AsyncFailsafe<Object> failSafe) {
+        CompletableFuture<D> thisFuture = failSafe.future(() -> {
+            Promise<D, F> promise = supplier.get();
+            return promiseToFuture(promise);
+        });
+        return new FailSafePromise<>(thisFuture);
     }
 
-    public static <D, F extends Throwable> FailSafePromise<D, F> from(
+    public static <D, F extends Throwable> FailSafePromise<D, F> fromPromise(
             Function<ExecutionContext, Promise<D, F>> callable, AsyncFailsafe<Object> failSafe) {
         CompletableFuture<D> thisFuture = failSafe.future(executionContext -> {
             Promise<D, F> promise = callable.apply(executionContext);
-            CompletableFuture<D> future = new CompletableFuture<>();
-            promise.done(future::complete).fail(future::completeExceptionally);
-            return future;
+            return promiseToFuture(promise);
         });
         return new FailSafePromise<>(thisFuture);
+    }
+
+    private static <D, F extends Throwable> CompletableFuture<D> promiseToFuture(Promise<D, F> promise) {
+        CompletableFuture<D> future = new CompletableFuture<>();
+        promise.done(future::complete).fail(future::completeExceptionally);
+        return future;
     }
 }
