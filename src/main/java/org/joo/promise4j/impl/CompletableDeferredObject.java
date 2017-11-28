@@ -2,7 +2,6 @@ package org.joo.promise4j.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.joo.promise4j.AbstractPromise;
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -41,19 +42,22 @@ public class TestMultiThread {
                 deferred.resolve(1);
             });
             deferred.promise().done(done -> {
-                if (atomicCounter.incrementAndGet() == iterations) {
+                if (atomicCounter.incrementAndGet() == iterations * 2)
                     latch.countDown();
-                }
             }).fail(ex -> {
-                Assert.fail();
+                
+            }).always((status, response, ex) -> {
+                if (atomicCounter.incrementAndGet() == iterations * 2)
+                    latch.countDown();
             });
         }
         
         try {
-            latch.await();
+            latch.await(1000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Assert.fail(e.getMessage());
         }
+        Assert.assertEquals(iterations * 2, atomicCounter.get());
         long ellapsed = System.currentTimeMillis() - start;
         long pace = iterations * 1000 / ellapsed;
         System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");

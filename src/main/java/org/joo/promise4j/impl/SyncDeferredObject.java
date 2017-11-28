@@ -1,6 +1,5 @@
 package org.joo.promise4j.impl;
 
-import org.joo.promise4j.AbstractPromise;
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
