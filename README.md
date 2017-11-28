@@ -150,7 +150,7 @@ return (Promise)someIncompatiblePromise;
 
 ## simple versions
 
-Sometimes, it's not necessary to use `AsyncDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
+Sometimes, it's not necessary to use `AsyncDeferredObject` or `CompletableDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
 
 1. If you already have the done/fail callback and not intend to assign the callback later:
 
