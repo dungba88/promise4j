@@ -10,7 +10,7 @@ Simple deferred/promise framework for Java. It supplements the asynchronous capa
 
 ## what is promise
 
-A promise is...well, a promise. Let say you ask somebody to do something for you. He is currently busy, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or when he cannot do it for you. Put it in techincal terms:
+A promise is...well, a promise. Let say you ask somebody to do something for you. He *might* be busy at the moment, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or when he cannot do it for you. Put it in techincal terms:
 
 - The person you asks is called a *deferred object*. A deferred object will give you a *promise*
 - The act of fulfilling the job is called *resolve*
