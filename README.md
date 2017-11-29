@@ -8,6 +8,18 @@
 
 Simple deferred/promise framework for Java. It supplements the asynchronous capability of Java by introducing Javascript-style promise.
 
+## table of contents
+
+- [what is promise](#what_is_promise)
+- [install](#install)
+- [how to use](#how_to_use)
+- advanced
+    - [pip and filter](#pipe_and_filter)
+    - [joined promise](#joined_promise)
+    - [simple versions](#simple_versions)
+    - [limitations](#limitations)
+- [license](#license)
+
 ## what is promise
 
 A promise is...well, a promise. Let say you ask somebody to do something for you. He *might* be busy at the moment, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or when he cannot do it for you. Put it in techincal terms:
@@ -198,6 +210,10 @@ Same for rejecting case, you will use `SimpleFailurePromise`
 
 Currently `AsyncDeferredObject` and `SyncDeferredObject` only supports 1 done callback and 1 fail callback per `Promise`. Adding more callbacks by calling multiple `done()` or `fail()` will lead to unexpected results. Only `CompletableDeferredObject` will support multi-callbacks.
 
-## deadlocks with SyncDeferredObject
+**Deadlocks with SyncDeferredObject**
 
 There are cases where `SyncDeferredObject` can cause deadlock. Because it uses `synchronized` so the thread registering the callback (calls `promise.done(...)`) and the thread resolving the deferred (calls `deferred.resolve(...)`) will have to wait on the same lock. If they again both wait for another lock, then deadlock might happen. So you should use it with cautions and make sure they don't wait on any other lock. This might not be obvious since it depends on the framework/platform you use.
+
+## license
+
+This library is distributed under MIT license, see [LICENSE](LICENSE)
