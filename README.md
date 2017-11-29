@@ -10,13 +10,13 @@ Simple deferred/promise framework for Java. It supplements the asynchronous capa
 
 ## table of contents
 
-- [what is promise](#what_is_promise)
+- [what is promise](#what-is-promise)
 - [install](#install)
-- [how to use](#how_to_use)
-- advanced
-    - [pip and filter](#pipe_and_filter)
-    - [joined promise](#joined_promise)
-    - [simple versions](#simple_versions)
+- [how to use](#how-to-use)
+- [advanced topics](#advanced-topics)
+    - [pip and filter](#pipe-and-filter)
+    - [joined promise](#joined-promise)
+    - [simple versions](#simple-versions)
     - [limitations](#limitations)
 - [license](#license)
 
@@ -76,7 +76,9 @@ deferred.promise().done(response -> {
 
 The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is done or failed.
 
-## pipe and filter
+## advanced topics
+
+### pipe and filter
 
 You can also chain the processing via `pipeDone()`, `pipeFail`, `filterDone()` and `filterFail()`:
 
@@ -162,7 +164,7 @@ Although with the second approach you don't have to add a try-catch block, it te
 return (Promise)someIncompatiblePromise;
 ```
 
-## joined promise
+### joined promise
 
 Since `1.1.0`, you can make use of `JoinedPromise` to join multiple promises into a single one.
 
@@ -178,7 +180,7 @@ The conditions for callbacks are as below:
 
 The fail callback will be triggered only once for the first rejected child promise. Any other failure are ignore.
 
-## simple versions
+### simple versions
 
 Sometimes, it's not necessary to use `AsyncDeferredObject` or `CompletableDeferredObject` since you already have the callback, or the result in hand. By using simpler versions, you will eliminate all of the overheads introduced by spinlocks.
 
@@ -206,7 +208,7 @@ Same for rejecting case, you will use `SimpleFailurePromise`
 
 *All simple versions are not thread-safe and should be used with cautions*
 
-## limitations
+### limitations
 
 Currently `AsyncDeferredObject` and `SyncDeferredObject` only supports 1 done callback and 1 fail callback per `Promise`. Adding more callbacks by calling multiple `done()` or `fail()` will lead to unexpected results. Only `CompletableDeferredObject` will support multi-callbacks.
 
