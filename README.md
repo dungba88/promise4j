@@ -128,7 +128,7 @@ If any exception is thrown while executing the preceding stage, that stage is co
 
 Best practice is that you always be consistent in the exception type and try not to throw exception. There are two ways you can achieve this:
 
-1. Wrap your pipe handler with a try-catch block and reject the promise yourself with the same exception type:
+1. Wrap your pipe handler with a try-catch block and reject the promise yourself with the expected exception type:
 
 ```java
 ...pipeDone(response -> {
