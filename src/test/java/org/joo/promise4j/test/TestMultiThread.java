@@ -177,7 +177,7 @@ public class TestMultiThread {
         getWaitExecutor.shutdownNow();
 
         try {
-            latch.await(1000, TimeUnit.MILLISECONDS);
+            latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             Assert.fail(e.getMessage());
@@ -219,7 +219,7 @@ public class TestMultiThread {
         getWaitExecutor.shutdownNow();
 
         try {
-            latch.await(1000, TimeUnit.MILLISECONDS);
+            latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             Assert.fail(e.getMessage());
