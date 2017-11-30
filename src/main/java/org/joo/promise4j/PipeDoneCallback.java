@@ -2,7 +2,7 @@ package org.joo.promise4j;
 
 /**
  * Represents a pipe for fulfilled promise. Pipe is similar to filter, except
- * that they returns a {@Promise} instead of the result.
+ * that they returns a {@link org.joo.promise4j.Promise} instead of the result.
  * 
  * @author griever
  *
