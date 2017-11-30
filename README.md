@@ -190,14 +190,28 @@ Since `1.1.1`, retry is supported with `FailSafePromise`:
 RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
     .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
 
-// construct the promise
-Promise promise = FailSafePromise.from(this::trySomethingException, Failsafe.with(retryPolicy).with(executor));
+// construct the promise from response supplier
+Promise promise = FailSafePromise.from(() -> {
+    // some logic that might cause exception
+    return someResponse;
+}, Failsafe.with(retryPolicy).with(executor));
+
+// or construct from promise supplier
+Promise promise = FailSafePromise.fromPromise(() -> {
+    // some logic that might cause failure
+    return somePromise;
+}, Failsafe.with(retryPolicy).with(executor));
 
 // use the promise as usual
 promise.done(...).fail(...).pipeDone(...);
 ```
 
-The `RetryPolicy`, `FailSafe` is coming from [@jhalterman/failsafe](https://github.com/jhalterman/failsafe). You can refer to their manual separately. The promise will only accept a `AsyncFailSafe` (by calling `.with(executor)`)
+The `RetryPolicy`, `FailSafe` is coming from [@jhalterman/failsafe](https://github.com/jhalterman/failsafe). You can refer to their manual for more details. The promise will only accept a `AsyncFailSafe` (by calling `.with(executor)`). A retry will be triggered to the `FailSafe` engine if one the following conditions are satisfied:
+
+- You call `.from(...)` and an exception is thrown
+- You call `.fromPromise(...)` and either an exception is thrown, or you explicitly reject the returned promise
+
+Note that even that the above conditions are true, retry might not happen because the policy you set doesn't match. These are managed by the `FailSafe` engine itself (again, refer to their manual).
 
 ### simple versions
 
