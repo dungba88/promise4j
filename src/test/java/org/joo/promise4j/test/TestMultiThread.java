@@ -15,6 +15,7 @@ import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.impl.AsyncDeferredObject;
 import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.SyncDeferredObject;
+import org.joo.promise4j.util.ThreadHints;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -237,6 +238,8 @@ public class TestMultiThread {
         AtomicInteger atomicCounter = new AtomicInteger(0);
         ExecutorService getWaitExecutor = Executors.newFixedThreadPool(7);
         int iterations = 100;
+        
+        ThreadHints.onSpinWait();
 
         long start = System.nanoTime();
         for (int i = 0; i < iterations; i++) {
