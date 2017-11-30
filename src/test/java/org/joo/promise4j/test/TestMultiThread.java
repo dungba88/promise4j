@@ -243,7 +243,7 @@ public class TestMultiThread {
             final Deferred<Object, Throwable> deferred = deferredSupplier.get();
             getWaitExecutor.submit(() -> {
                 try {
-                    Assert.assertEquals(1, deferred.promise().get(100, TimeUnit.MILLISECONDS));
+                    Assert.assertEquals(1, deferred.promise().get(500, TimeUnit.NANOSECONDS));
                 } catch (PromiseException e) {
                     Assert.fail(e.getMessage());
                 } catch (InterruptedException e) {
@@ -257,7 +257,7 @@ public class TestMultiThread {
         }
         
         try {
-            latch.await(10000, TimeUnit.MILLISECONDS);
+            latch.await(1000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             Assert.fail(e.getMessage());
