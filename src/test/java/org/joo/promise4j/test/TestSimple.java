@@ -1,8 +1,12 @@
 package org.joo.promise4j.test;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.Promise;
+import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.impl.SimpleDeferredObject;
 import org.joo.promise4j.impl.SimpleDonePromise;
 import org.joo.promise4j.impl.SimpleFailurePromise;
@@ -42,6 +46,24 @@ public class TestSimple {
             Assert.fail("must fail");
         } catch (UnsupportedOperationException ex) {
             Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        }
+        
+        try {
+            deferred.promise().get();
+            Assert.fail("must fail");
+        } catch (UnsupportedOperationException ex) {
+            Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+        
+        try {
+            deferred.promise().get(1000, TimeUnit.MILLISECONDS);
+            Assert.fail("must fail");
+        } catch (UnsupportedOperationException ex) {
+            Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -118,6 +140,18 @@ public class TestSimple {
             Assert.assertNull(ex);
             Assert.assertEquals(1, response);
         });
+        
+        try {
+            Assert.assertEquals(1, promise.get());
+        } catch (PromiseException | InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        
+        try {
+            Assert.assertEquals(1, promise.get(1000, TimeUnit.MILLISECONDS));
+        } catch (PromiseException | InterruptedException | TimeoutException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -133,5 +167,23 @@ public class TestSimple {
             Assert.assertNull(response);
             Assert.assertTrue(ex instanceof UnsupportedOperationException);
         });
+        
+        try {
+            promise.get();
+            Assert.fail("must fail");
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
+        }
+        
+        try {
+            promise.get(1000, TimeUnit.MILLISECONDS);
+            Assert.fail("must fail");
+        } catch (InterruptedException | TimeoutException e) {
+            Assert.fail(e.getMessage());
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
+        }
     }
 }

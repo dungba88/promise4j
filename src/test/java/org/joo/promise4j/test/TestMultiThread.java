@@ -6,10 +6,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.Deferred;
+import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.impl.AsyncDeferredObject;
 import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.SyncDeferredObject;
@@ -60,6 +62,83 @@ public class TestMultiThread {
         Assert.assertEquals(iterations * 2, atomicCounter.get());
         long ellapsed = System.currentTimeMillis() - start;
         long pace = iterations * 1000 / ellapsed;
+        System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");
+    }
+    
+    @Test
+    public void testResolveWithSyncGetTimeout() {
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicInteger atomicCounter = new AtomicInteger(0);
+        ExecutorService resolveExecutor = Executors.newFixedThreadPool(7);
+        ExecutorService getWaitExecutor = Executors.newFixedThreadPool(7);
+        int iterations = 1000000;
+        
+        long start = System.nanoTime();
+        for(int i=0; i<iterations; i++) {
+            final Deferred<Object, Throwable> deferred = deferredSupplier.get();
+            resolveExecutor.submit(() -> {
+                deferred.resolve(1);
+            });
+            
+            getWaitExecutor.submit(() -> {
+                try {
+                    Assert.assertEquals(1, deferred.promise().get(1000, TimeUnit.MILLISECONDS));
+                } catch (PromiseException | InterruptedException | TimeoutException e) {
+                    Assert.fail(e.getMessage());
+                }
+                
+                if (atomicCounter.incrementAndGet() == iterations)
+                    latch.countDown();
+            });
+        }
+        
+        try {
+            latch.await(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        
+        Assert.assertEquals(iterations, atomicCounter.get());
+        long ellapsed = System.nanoTime() - start;
+        long pace = iterations * 1000000000L / ellapsed;
+        System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");
+    }
+    
+    @Test
+    public void testResolveWithSyncGet() {
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicInteger atomicCounter = new AtomicInteger(0);
+        ExecutorService resolveExecutor = Executors.newFixedThreadPool(7);
+        ExecutorService getWaitExecutor = Executors.newFixedThreadPool(7);
+        int iterations = 1000000;
+        
+        long start = System.nanoTime();
+        for(int i=0; i<iterations; i++) {
+            final Deferred<Object, Throwable> deferred = deferredSupplier.get();
+            getWaitExecutor.submit(() -> {
+                try {
+                    Assert.assertEquals(1, deferred.promise().get());
+                } catch (PromiseException | InterruptedException e) {
+                    Assert.fail(e.getMessage());
+                }
+                
+                if (atomicCounter.incrementAndGet() == iterations)
+                    latch.countDown();
+            });
+            resolveExecutor.submit(() -> {
+                deferred.resolve(1);
+            });
+        }
+        
+        try {
+            latch.await(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        
+        Assert.assertEquals(iterations, atomicCounter.get());
+        long ellapsed = System.nanoTime() - start;
+        long pace = iterations * 1000000000L / ellapsed;
         System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");
     }
 

@@ -1,11 +1,16 @@
 package org.joo.promise4j.impl;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
+import org.joo.promise4j.PromiseException;
 
 public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -13,13 +18,15 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
 
     private F failedCause;
 
-    private DeferredStatus status;
+    private volatile DeferredStatus status;
 
     private AlwaysCallback<D, F> alwaysCallback;
 
     private DoneCallback<D> doneCallback;
 
     private FailCallback<F> failCallback;
+
+    private CountDownLatch latch = new CountDownLatch(1);
 
     @Override
     public Deferred<D, F> resolve(final D resolve) {
@@ -97,6 +104,8 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
     private void triggerAlways(final AlwaysCallback<D, F> callback, final D resolve, final F reject) {
         if (callback != null)
             callback.onAlways(status, resolve, reject);
+
+        latch.countDown();
     }
 
     @Override
@@ -114,5 +123,24 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
 
     public boolean isRejected() {
         return status == DeferredStatus.REJECTED;
+    }
+
+    @Override
+    public D get() throws PromiseException, InterruptedException {
+        latch.await();
+        if (status == DeferredStatus.REJECTED)
+            throw new PromiseException(failedCause);
+        return result;
+    }
+
+    @Override
+    public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException, InterruptedException {
+        latch.await(timeout, unit);
+        DeferredStatus theStatus = status;
+        if (theStatus == DeferredStatus.REJECTED)
+            throw new PromiseException(failedCause);
+        if (theStatus == DeferredStatus.RESOLVED)
+            return result;
+        throw new TimeoutException();
     }
 }

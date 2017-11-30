@@ -3,12 +3,15 @@ package org.joo.promise4j.test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.Promise;
+import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.impl.AsyncDeferredObject;
 import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.JoinedPromise;
@@ -46,6 +49,23 @@ public class TestSingleThread {
             counter.incrementAndGet();
         });
         Assert.assertEquals(2, counter.get());
+        
+        try {
+            Assert.assertEquals(1, deferred.promise().get());
+        } catch (PromiseException e) {
+            Assert.fail(e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        }
+        try {
+            Assert.assertEquals(1, deferred.promise().get(1000, TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        } catch (PromiseException | TimeoutException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -65,6 +85,23 @@ public class TestSingleThread {
         });
         deferred.resolve(1);
         Assert.assertEquals(2, counter.get());
+        
+        try {
+            Assert.assertEquals(1, deferred.promise().get());
+        } catch (PromiseException e) {
+            Assert.fail(e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        }
+        try {
+            Assert.assertEquals(1, deferred.promise().get(1000, TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        } catch (PromiseException | TimeoutException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -84,6 +121,28 @@ public class TestSingleThread {
             counter.incrementAndGet();
         });
         Assert.assertEquals(2, counter.get());
+        
+        try {
+            deferred.promise().get();
+            Assert.fail("must fail");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
+        }
+        
+        try {
+            deferred.promise().get(1000, TimeUnit.MILLISECONDS);
+            Assert.fail("must fail");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
+        } catch (TimeoutException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test
@@ -103,6 +162,28 @@ public class TestSingleThread {
         });
         deferred.reject(new UnsupportedOperationException());
         Assert.assertEquals(2, counter.get());
+        
+        try {
+            deferred.promise().get();
+            Assert.fail("must fail");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
+        }
+        
+        try {
+            deferred.promise().get(1000, TimeUnit.MILLISECONDS);
+            Assert.fail("must fail");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Assert.fail(e.getMessage());
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
+        } catch (TimeoutException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     @Test

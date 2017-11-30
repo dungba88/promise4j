@@ -1,6 +1,9 @@
 package org.joo.promise4j.impl;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.LockSupport;
 
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
@@ -8,13 +11,16 @@ import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
+import org.joo.promise4j.PromiseException;
 
 public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
+
+    private static final long SPIN_FOR_TIMEOUT_THRESHOLDS = 1000L;
 
     private D result;
 
     private F failedCause;
-    
+
     private volatile AlwaysCallback<D, F> alwaysCallback;
 
     private volatile DoneCallback<D> doneCallback;
@@ -26,7 +32,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     private AtomicBoolean done;
 
     private AtomicBoolean alert;
-    
+
     private AtomicBoolean alwaysAlert;
 
     public AsyncDeferredObject() {
@@ -73,7 +79,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     public Promise<D, F> promise() {
         return this;
     }
-    
+
     @Override
     public Promise<D, F> always(AlwaysCallback<D, F> callback) {
         alwaysCallback = callback;
@@ -96,5 +102,33 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
         if (status == DeferredStatus.REJECTED && alert.compareAndSet(false, true))
             callback.onFail(failedCause);
         return this;
+    }
+
+    @Override
+    public D get() throws PromiseException {
+        while (true) {
+            if (status == DeferredStatus.RESOLVED)
+                return result;
+            if (status == DeferredStatus.REJECTED)
+                throw new PromiseException(failedCause);
+            LockSupport.parkNanos(0L);
+        }
+    }
+
+    @Override
+    public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException {
+        long waitTime = unit.toNanos(timeout);
+        long start = System.nanoTime();
+        while (true) {
+            if (status == DeferredStatus.RESOLVED)
+                return result;
+            if (status == DeferredStatus.REJECTED)
+                throw new PromiseException(failedCause);
+            long remainingTime = waitTime - (System.nanoTime() - start);
+            if (remainingTime <= 0)
+                throw new TimeoutException();
+            if (remainingTime >= SPIN_FOR_TIMEOUT_THRESHOLDS)
+                LockSupport.parkNanos(0L);
+        }
     }
 }

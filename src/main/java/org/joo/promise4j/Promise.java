@@ -1,5 +1,8 @@
 package org.joo.promise4j;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 /**
  * Represents a Promise
  * 
@@ -31,6 +34,23 @@ public interface Promise<D, F extends Throwable> {
     public Promise<D, F> always(AlwaysCallback<D, F> callback);
 
     /**
+     * Wait and get for the result. If the promise is rejected, the a exception will
+     * be thrown
+     * 
+     * @return the result
+     */
+    public D get() throws PromiseException, InterruptedException;
+
+    /**
+     * Wait and get for the result for a specified timeout. If the promise is
+     * rejected, the a PromiseException will be raised. If the promise has not been
+     * completed after timeout, a TimeoutException will be raised.
+     * 
+     * @return the result
+     */
+    public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException, InterruptedException;
+
+    /**
      * Register a piped callback when the previous promise is fulfilled. This method
      * will return a new Promise object.
      */
@@ -44,14 +64,14 @@ public interface Promise<D, F extends Throwable> {
             PipeFailureCallback<F, D_OUT, F_OUT> failCallback);
 
     /**
-     * Register a filtered callback when the previous promise is fulfilled. This method
-     * will return a new Promise object.
+     * Register a filtered callback when the previous promise is fulfilled. This
+     * method will return a new Promise object.
      */
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(FilteredDoneCallback<D, D_OUT> callback);
 
     /**
-     * Register a filtered callback when the previous promise is rejected. This method
-     * will return a new Promise object.
+     * Register a filtered callback when the previous promise is rejected. This
+     * method will return a new Promise object.
      */
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterFail(
             FilteredFailureCallback<F, F_OUT> failCallback);
