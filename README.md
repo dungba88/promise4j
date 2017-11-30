@@ -226,6 +226,8 @@ DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new SimpleDefer
 ...
 ```
 
+*Note that you cannot assign the callback later if you use `SimpleDeferredObject`. A `UnsupportedOperationException` will be thrown if you try to do so.*
+
 2. If you already have the response, you don't even need to create a `Deferred`!:
 
 ```java
