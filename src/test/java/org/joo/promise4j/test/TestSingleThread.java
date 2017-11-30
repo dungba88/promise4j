@@ -276,7 +276,7 @@ public class TestSingleThread {
             Thread.currentThread().interrupt();
         }
     }
-
+    
     @Parameters
     public static List<Object[]> data() {
         List<Object[]> list = new ArrayList<>();

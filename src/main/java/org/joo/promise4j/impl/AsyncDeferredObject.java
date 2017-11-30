@@ -12,6 +12,7 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
+import org.joo.promise4j.util.ThreadHints;
 
 public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -105,8 +106,10 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     }
 
     @Override
-    public D get() throws PromiseException {
+    public D get() throws PromiseException, InterruptedException {
         while (true) {
+            if (Thread.interrupted())
+                throw new InterruptedException();
             if (status == DeferredStatus.RESOLVED)
                 return result;
             if (status == DeferredStatus.REJECTED)
@@ -116,19 +119,23 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     }
 
     @Override
-    public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException {
+    public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException, InterruptedException {
         long waitTime = unit.toNanos(timeout);
         long start = System.nanoTime();
         while (true) {
+            if (Thread.interrupted())
+                throw new InterruptedException();
             if (status == DeferredStatus.RESOLVED)
                 return result;
             if (status == DeferredStatus.REJECTED)
                 throw new PromiseException(failedCause);
             long remainingTime = waitTime - (System.nanoTime() - start);
-            if (remainingTime <= 0)
+            if (remainingTime <= 0L)
                 throw new TimeoutException();
             if (remainingTime >= SPIN_FOR_TIMEOUT_THRESHOLDS)
                 LockSupport.parkNanos(0L);
+            else
+                ThreadHints.onSpinWait();
         }
     }
 }
