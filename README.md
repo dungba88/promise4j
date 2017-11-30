@@ -16,6 +16,7 @@ Simple deferred/promise framework for Java. It supplements the asynchronous capa
 - [advanced topics](#advanced-topics)
     - [pip and filter](#pipe-and-filter)
     - [joined promise](#joined-promise)
+    - [retry](#retry)
     - [simple versions](#simple-versions)
     - [limitations](#limitations)
 - [license](#license)
@@ -179,6 +180,24 @@ The conditions for callbacks are as below:
 - The joined promise will be considered completed if *all* child promises are either resolved or rejected
 
 The fail callback will be triggered only once for the first rejected child promise. Any other failure are ignore.
+
+### retry
+
+Since `1.1.1`, retry is supported with `FailSafePromise`:
+
+```java
+// create a retry policy to retry at most 3 times and 100 milliseconds delay between each retry
+RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
+    .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+
+// construct the promise
+Promise promise = FailSafePromise.from(this::trySomethingException, Failsafe.with(retryPolicy).with(executor));
+
+// use the promise as usual
+promise.done(...).fail(...).pipeDone(...);
+```
+
+The `RetryPolicy`, `FailSafe` is coming from [@jhalterman/failsafe](https://github.com/jhalterman/failsafe). You can refer to their manual separately. The promise will only accept a `AsyncFailSafe` (by calling `.with(executor)`)
 
 ### simple versions
 
