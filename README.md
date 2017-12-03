@@ -38,7 +38,7 @@ A promise is...well, a promise. Let say you ask somebody to do something for you
 
 Install with Maven:
 
-```
+```xml
 <dependency>
     <groupId>org.dungba</groupId>
     <artifactId>joo-promise4j</artifactId>
