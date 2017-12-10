@@ -54,15 +54,12 @@ class InternalJoinedResults<D> {
 
     private final List<D> results;
     
-    private volatile boolean alert;
-
     public InternalJoinedResults(int size) {
         results = new ArrayList<>(Collections.nCopies(size, null));
     }
 
     public void set(int idx, D result) {
         results.set(idx, result);
-        alert = true;
     }
 
     public JoinedResults<D> toJoinedResults() {
