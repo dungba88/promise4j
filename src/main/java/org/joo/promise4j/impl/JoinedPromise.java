@@ -53,6 +53,8 @@ public class JoinedPromise<D, F extends Throwable> extends CompletableDeferredOb
 class InternalJoinedResults<D> {
 
     private final List<D> results;
+    
+    private volatile boolean alert;
 
     public InternalJoinedResults(int size) {
         results = new ArrayList<>(Collections.nCopies(size, null));
@@ -60,6 +62,7 @@ class InternalJoinedResults<D> {
 
     public void set(int idx, D result) {
         results.set(idx, result);
+        alert = true;
     }
 
     public JoinedResults<D> toJoinedResults() {
