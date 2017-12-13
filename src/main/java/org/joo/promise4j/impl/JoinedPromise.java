@@ -1,10 +1,10 @@
 package org.joo.promise4j.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.joo.promise4j.Deferred;
@@ -55,7 +55,7 @@ class InternalJoinedResults<D> {
     private final List<D> results;
     
     public InternalJoinedResults(int size) {
-        results = new ArrayList<>(Collections.nCopies(size, null));
+        results = new CopyOnWriteArrayList<>(Collections.nCopies(size, null));
     }
 
     public void set(int idx, D result) {
