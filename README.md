@@ -5,7 +5,7 @@
 [![Build Status](https://travis-ci.org/dungba88/promise4j.svg?branch=master)](https://travis-ci.org/dungba88/promise4j)
 [![Coverage Status](https://coveralls.io/repos/github/dungba88/promise4j/badge.svg?branch=master)](https://coveralls.io/github/dungba88/promise4j?branch=master)
 
-Simple deferred/promise framework for Java with minimal dependencies. It supplements the asynchronous capability of Java by introducing Javascript-style promise (join, pipe, filter, etc.). It only depends on [net.jodah/failsafe](https://mvnrepository.com/artifact/net.jodah/failsafe) for retry purpose.
+Fluent deferred/promise framework for Java with minimal dependencies. It supplements the asynchronous capability of Java by introducing Javascript-style promise (join, pipe, filter, etc.). It only depends on [net.jodah/failsafe](https://mvnrepository.com/artifact/net.jodah/failsafe) for retry purpose.
 
 ## table of contents
 
@@ -75,6 +75,8 @@ deferred.promise().done(response -> {
 ```
 
 The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is done or failed.
+
+`done`, `fail` and `always` will return the same promise so that you can chain them together, creating a *fluent* programming.
 
 ## advanced topics
 
