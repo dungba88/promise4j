@@ -212,7 +212,7 @@ The `RetryPolicy`, `FailSafe` is coming from [@jhalterman/failsafe](https://gith
 - You call `.from(...)` and an exception is thrown
 - You call `.fromPromise(...)` and either an exception is thrown, or you explicitly reject the returned promise
 
-Note that even that the above conditions are true, retry might not happen because the policy you set doesn't match. These are managed by the `FailSafe` engine itself (again, refer to their manual).
+Note that even if the above conditions are true, retry might not happen because the policy you set doesn't match. These are managed by the `FailSafe` engine itself (again, refer to their manual).
 
 ### simple versions
 
