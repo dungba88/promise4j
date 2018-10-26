@@ -51,7 +51,7 @@ To create an asynchronous deferred object:
 DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new AsyncDeferredObject<>();
 ```
 
-Same for other deferred type. Then you can pass it to the provider (the one who actually do the job), there you can call `resolve()` or `reject()`:
+After that you can pass it to the provider (the one who actually do the job), and call `resolve()` or `reject()` on the deferred object:
 
 ```java
 try {
@@ -74,7 +74,9 @@ deferred.promise().done(response -> {
 });
 ```
 
-The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is done or failed.
+*Note: It's actually better to pass the promise to the consumer, since they don't need to care about the deferred object*
+
+The done callback will be invoked when `resolve()` is called with a response, and the fail callback will be invoked when `reject()` is called with an exception. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is resolved or rejected.
 
 `done`, `fail` and `always` will return the same promise so that you can chain them together, creating a *fluent* programming.
 
