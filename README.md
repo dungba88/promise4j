@@ -1,16 +1,11 @@
 # promise4j
 
-[![License](https://img.shields.io/github/license/dungba88/promise4j.svg?maxAge=2592000)](LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/org.dungba/joo-promise4j.svg?maxAge=604800)](http://mvnrepository.com/artifact/org.dungba/joo-promise4j)
 [![Javadocs](http://javadoc.io/badge/org.dungba/joo-promise4j.svg)](http://javadoc.io/doc/org.dungba/joo-promise4j)
-
-**continous integration**
-
 [![Build Status](https://travis-ci.org/dungba88/promise4j.svg?branch=master)](https://travis-ci.org/dungba88/promise4j)
 [![Coverage Status](https://coveralls.io/repos/github/dungba88/promise4j/badge.svg?branch=master)](https://coveralls.io/github/dungba88/promise4j?branch=master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/e9ed4ade5bed42c5a711db92b5288ffc)](https://www.codacy.com/app/dungba88/promise4j?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dungba88/promise4j&amp;utm_campaign=Badge_Grade)
 
-Simple deferred/promise framework for Java with minimal dependencies. It supplements the asynchronous capability of Java by introducing Javascript-style promise (join, pipe, filter, etc.). It only depends on [net.jodah/failsafe](https://mvnrepository.com/artifact/net.jodah/failsafe) for retry purpose.
+Fluent deferred/promise framework for Java with minimal dependencies. It supplements the asynchronous capability of Java by introducing Javascript-style promise (join, pipe, filter, etc.). It only depends on [net.jodah/failsafe](https://mvnrepository.com/artifact/net.jodah/failsafe) for retry purpose.
 
 ## table of contents
 
@@ -27,12 +22,12 @@ Simple deferred/promise framework for Java with minimal dependencies. It supplem
 
 ## what is promise
 
-A promise is...well, a promise. Let say you ask somebody to do something for you. He *might* be busy at the moment, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or when he cannot do it for you. Put it in techincal terms:
+A promise is...well, a promise. Let say you ask somebody to do something for you. He *might* be busy at the moment, but he *promises* he will do it *some unspecified time* in the future, and he will tell you once he finishes the job, or reject when he cannot do it for you. Put it in techincal terms:
 
 - The person you asks is called a *deferred object*. A deferred object will give you a *promise*
 - The act of fulfilling the job is called *resolve*
 - The act of rejecting the job is called *reject*
-- You use *callbacks* to wait for the result
+- You use *callbacks* to handle for the result
 
 ## install
 
@@ -42,7 +37,7 @@ Install with Maven:
 <dependency>
     <groupId>org.dungba</groupId>
     <artifactId>joo-promise4j</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
@@ -56,7 +51,7 @@ To create an asynchronous deferred object:
 DeferredObject<SomeResponseClass, SomeExceptionClass> deferred = new AsyncDeferredObject<>();
 ```
 
-Same for other deferred type. Then you can pass it to the provider (the one who actually do the job), there you can call `resolve()` or `reject()`:
+After that you can pass it to the provider (the one who actually do the job), and call `resolve()` or `reject()` on the deferred object:
 
 ```java
 try {
@@ -79,7 +74,11 @@ deferred.promise().done(response -> {
 });
 ```
 
-The done callback will be called when the provider call `resolve()` with a response, and the fail callback will called when `reject()` is called. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is done or failed.
+*Note: It's actually better to pass the promise to the consumer, since they don't need to care about the deferred object*
+
+The done callback will be invoked when `resolve()` is called with a response, and the fail callback will be invoked when `reject()` is called with an exception. Since `1.1.0`, you can use AlwaysCallback to be notified when the promise completes, regardless whether it is resolved or rejected.
+
+`done`, `fail` and `always` will return the same promise so that you can chain them together, creating a *fluent* programming.
 
 ## advanced topics
 
@@ -215,7 +214,7 @@ The `RetryPolicy`, `FailSafe` is coming from [@jhalterman/failsafe](https://gith
 - You call `.from(...)` and an exception is thrown
 - You call `.fromPromise(...)` and either an exception is thrown, or you explicitly reject the returned promise
 
-Note that even that the above conditions are true, retry might not happen because the policy you set doesn't match. These are managed by the `FailSafe` engine itself (again, refer to their manual).
+Note that even if the above conditions are true, retry might not happen because the policy you set doesn't match. These are managed by the `FailSafe` engine itself (again, refer to their manual).
 
 ### simple versions
 
