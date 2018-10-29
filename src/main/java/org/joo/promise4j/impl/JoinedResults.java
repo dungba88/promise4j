@@ -6,22 +6,22 @@ import java.util.List;
 
 public class JoinedResults<D> implements Iterable<D> {
 
-    private final List<D> results;
-    
-    public JoinedResults(List<D> results) {
-        this.results = Collections.unmodifiableList(results);
-    }
+	private final List<D> results;
 
-    public D get(int idx) {
-        return results.get(idx);
-    }
+	public JoinedResults(List<D> results) {
+		this.results = Collections.unmodifiableList(results);
+	}
 
-    @Override
-    public Iterator<D> iterator() {
-        return results.iterator();
-    }
+	public D get(int idx) {
+		return results.get(idx);
+	}
 
-    public int size() {
-        return results.size();
-    }
+	@Override
+	public Iterator<D> iterator() {
+		return results.iterator();
+	}
+
+	public int size() {
+		return results.size();
+	}
 }

@@ -6,21 +6,17 @@ package org.joo.promise4j;
  * 
  * @author griever
  *
- * @param <D>
- *            the response type when the promise is fulfilled
- * @param <D_OUT>
- *            the response type after piping
- * @param <F_OUT>
- *            the exception type after piping
+ * @param <D> the response type when the promise is fulfilled
+ * @param <D_OUT> the response type after piping
+ * @param <F_OUT> the exception type after piping
  */
 public interface PipeDoneCallback<D, D_OUT, F_OUT extends Throwable> {
 
-    /**
-     * A callback to be called when the promise is fulfilled.
-     * 
-     * @param result
-     *            the result of the promise
-     * @return the new promise
-     */
-    public Promise<D_OUT, F_OUT> onDone(final D result);
+	/**
+	 * A callback to be called when the promise is fulfilled.
+	 * 
+	 * @param result the result of the promise
+	 * @return the new promise
+	 */
+	public Promise<D_OUT, F_OUT> onDone(final D result);
 }
