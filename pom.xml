@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dungba</groupId>
 	<artifactId>joo-promise4j</artifactId>
-	<version>1.1.2-SNAPSHOT</version>
+	<version>1.1.2</version>
 	<packaging>jar</packaging>
 
 	<name>Promise4j</name>
@@ -22,7 +21,8 @@
 	<scm>
 		<url>https://github.com/dungba88/promise4j.git</url>
 		<developerConnection>scm:git:[fetch=]https://github.com/dungba88/promise4j.git</developerConnection>
-	</scm>
+	  <tag>joo-promise4j-1.1.2</tag>
+  </scm>
 
 	<dependencies>
 		<dependency>
@@ -106,7 +106,7 @@
 					<goals>deploy</goals>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.eluder.coveralls</groupId>
 				<artifactId>coveralls-maven-plugin</artifactId>
 				<version>4.3.0</version>
@@ -130,7 +130,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 		</plugins>
 	</build>
 
