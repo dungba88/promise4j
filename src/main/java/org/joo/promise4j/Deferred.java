@@ -17,7 +17,9 @@ public interface Deferred<D, F extends Throwable> {
 	 * Register a timeout, if time has passed and promise is not rejected or
 	 * resolved it will be rejected with TimeoutException.
 	 * 
-	 * @param callback the callback
+	 * @param timeout           the timeout
+	 * @param unit              the time unit
+	 * @param exceptionSupplier the supplier when timeout happens
 	 * @return the current promise
 	 */
 	public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier);
