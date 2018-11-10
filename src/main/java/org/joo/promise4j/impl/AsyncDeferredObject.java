@@ -45,7 +45,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
 	@Override
 	public Deferred<D, F> resolve(final D result) {
 		if (!done.compareAndSet(false, true))
-			throw new IllegalStateException("Deferred is already resolved or rejected");
+			return this;
 		this.result = result;
 		this.status = DeferredStatus.RESOLVED;
 		this.onComplete(result);
@@ -55,7 +55,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
 	@Override
 	public Deferred<D, F> reject(final F failedCause) {
 		if (!done.compareAndSet(false, true))
-			throw new IllegalStateException("Deferred is already resolved or rejected");
+			return this;
 		this.failedCause = failedCause;
 		this.status = DeferredStatus.REJECTED;
 		this.onFail(failedCause);
