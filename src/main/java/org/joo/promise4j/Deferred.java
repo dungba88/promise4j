@@ -1,5 +1,8 @@
 package org.joo.promise4j;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
 /**
  * Represents a Deferred object
  * 
@@ -9,6 +12,15 @@ package org.joo.promise4j;
  * @param <F> the exception type when the deferred is rejected
  */
 public interface Deferred<D, F extends Throwable> {
+
+	/**
+	 * Register a timeout, if time has passed and promise is not rejected or
+	 * resolved it will be rejected with TimeoutException.
+	 * 
+	 * @param callback the callback
+	 * @return the current promise
+	 */
+	public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier);
 
 	/**
 	 * Resolve the deferred

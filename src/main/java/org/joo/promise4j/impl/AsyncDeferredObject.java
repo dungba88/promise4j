@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.LockSupport;
+import java.util.function.Supplier;
 
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
@@ -13,6 +14,7 @@ import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.util.ThreadHints;
+import org.joo.promise4j.util.TimeoutScheduler;
 
 public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -137,5 +139,14 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
 			else
 				ThreadHints.onSpinWait();
 		}
+	}
+
+	@Override
+	public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier) {
+		TimeoutScheduler.delay(() -> {
+			if (status == null)
+				reject(exceptionSupplier.get());
+		}, timeout, unit);
+		return this;
 	}
 }

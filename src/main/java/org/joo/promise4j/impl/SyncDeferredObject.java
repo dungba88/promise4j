@@ -3,6 +3,7 @@ package org.joo.promise4j.impl;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
@@ -11,6 +12,7 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
+import org.joo.promise4j.util.TimeoutScheduler;
 
 public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -142,5 +144,14 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
 		if (theStatus == DeferredStatus.RESOLVED)
 			return result;
 		throw new TimeoutException();
+	}
+
+	@Override
+	public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier) {
+		TimeoutScheduler.delay(() -> {
+			if (isPending())
+				reject(exceptionSupplier.get());
+		}, timeout, unit);
+		return this;
 	}
 }

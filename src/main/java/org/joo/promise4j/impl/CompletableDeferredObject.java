@@ -2,8 +2,10 @@ package org.joo.promise4j.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
@@ -12,6 +14,8 @@ import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
+import org.joo.promise4j.util.FutureCanceller;
+import org.joo.promise4j.util.TimeoutScheduler;
 
 public class CompletableDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -86,5 +90,15 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
 		} catch (ExecutionException e) {
 			throw new PromiseException(e.getCause());
 		}
+	}
+
+	@Override
+	public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier) {
+		ScheduledFuture<?> timeoutFuture = TimeoutScheduler.delay(() -> {
+			if (!future.isDone())
+				future.completeExceptionally(exceptionSupplier.get());
+		}, timeout, unit);
+		future.whenComplete(new FutureCanceller(timeoutFuture));
+		return this;
 	}
 }
