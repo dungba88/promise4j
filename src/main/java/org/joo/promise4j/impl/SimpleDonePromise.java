@@ -44,4 +44,9 @@ public class SimpleDonePromise<D, F extends Throwable> extends AbstractPromise<D
 	public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException, InterruptedException {
 		return get();
 	}
+
+	@Override
+	public DeferredStatus getStatus() {
+		return DeferredStatus.RESOLVED;
+	}
 }

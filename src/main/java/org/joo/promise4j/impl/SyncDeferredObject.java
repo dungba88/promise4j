@@ -154,4 +154,9 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
 		}, timeout, unit);
 		return this;
 	}
+
+	@Override
+	public DeferredStatus getStatus() {
+		return status;
+	}
 }

@@ -12,6 +12,8 @@ import java.util.concurrent.TimeoutException;
  * @param <F> the exception type when promise is rejected
  */
 public interface Promise<D, F extends Throwable> {
+	
+	public DeferredStatus getStatus();
 
 	/**
 	 * Register a callback when promise is fulfilled. This method will return the

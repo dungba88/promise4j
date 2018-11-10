@@ -44,4 +44,9 @@ public class SimpleFailurePromise<D, F extends Throwable> extends AbstractPromis
 	public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException, InterruptedException {
 		throw new PromiseException(failedCause);
 	}
+
+	@Override
+	public DeferredStatus getStatus() {
+		return DeferredStatus.REJECTED;
+	}
 }

@@ -101,4 +101,11 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
 		future.whenComplete(new FutureCanceller(timeoutFuture));
 		return this;
 	}
+
+	@Override
+	public DeferredStatus getStatus() {
+		if (!future.isDone())
+			return null;
+		return future.isCompletedExceptionally() ? DeferredStatus.REJECTED : DeferredStatus.RESOLVED;
+	}
 }
