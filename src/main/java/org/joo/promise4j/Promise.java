@@ -43,6 +43,16 @@ public interface Promise<D, F extends Throwable> {
     public Promise<D, F> always(AlwaysCallback<D, F> callback);
 
     /**
+     * Forward the result of this promise to a Deferred object.
+     * 
+     * @param deferred the deferred object to be forward
+     * @return the current promise
+     */
+    public default Promise<D, F> forward(Deferred<D, F> deferred) {
+        return done(deferred::resolve).fail(deferred::reject);
+    }
+
+    /**
      * Wait and get for the result. If the promise is rejected, the a exception will
      * be thrown
      * 
