@@ -40,7 +40,7 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     @Override
     public Deferred<D, F> resolve(final D resolve) {
         if (!isPending())
-            throw new IllegalStateException("Deferred is already resolved or rejected");
+            return this;
 
         this.status = DeferredStatus.RESOLVED;
         triggerDone(doneCallback, resolve);
@@ -51,7 +51,8 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     @Override
     public Deferred<D, F> reject(final F reject) {
         if (!isPending())
-            throw new IllegalStateException("Deferred is already resolved or rejected");
+            return this;
+
         this.status = DeferredStatus.REJECTED;
         triggerFail(failCallback, reject);
         triggerAlways(alwaysCallback, null, reject);
