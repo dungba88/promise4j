@@ -49,7 +49,7 @@ public class TestSingleThread {
             counter.incrementAndGet();
         });
         Assert.assertEquals(2, counter.get());
-        
+
         try {
             Assert.assertEquals(1, deferred.promise().get());
         } catch (PromiseException e) {
@@ -85,7 +85,7 @@ public class TestSingleThread {
         });
         deferred.resolve(1);
         Assert.assertEquals(2, counter.get());
-        
+
         try {
             Assert.assertEquals(1, deferred.promise().get());
         } catch (PromiseException e) {
@@ -121,7 +121,7 @@ public class TestSingleThread {
             counter.incrementAndGet();
         });
         Assert.assertEquals(2, counter.get());
-        
+
         try {
             deferred.promise().get();
             Assert.fail("must fail");
@@ -131,7 +131,7 @@ public class TestSingleThread {
         } catch (PromiseException e) {
             Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
         }
-        
+
         try {
             deferred.promise().get(1000, TimeUnit.MILLISECONDS);
             Assert.fail("must fail");
@@ -162,7 +162,7 @@ public class TestSingleThread {
         });
         deferred.reject(new UnsupportedOperationException());
         Assert.assertEquals(2, counter.get());
-        
+
         try {
             deferred.promise().get();
             Assert.fail("must fail");
@@ -172,7 +172,7 @@ public class TestSingleThread {
         } catch (PromiseException e) {
             Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
         }
-        
+
         try {
             deferred.promise().get(1000, TimeUnit.MILLISECONDS);
             Assert.fail("must fail");
@@ -239,14 +239,14 @@ public class TestSingleThread {
     public void testJoinedPromise() {
         List<Promise<Object, Throwable>> deferreds = createDeferreds();
         testJoinedPromise(JoinedPromise.from(deferreds.toArray(new Promise[0])), deferreds);
-        
+
         deferreds = createDeferreds();
         testJoinedPromise(JoinedPromise.from(deferreds.toArray(new Deferred[0])), deferreds);
-        
+
         deferreds = createDeferreds();
         testJoinedPromise(JoinedPromise.from(deferreds), deferreds);
     }
-    
+
     @SuppressWarnings("unchecked")
     private List<Promise<Object, Throwable>> createDeferreds() {
         List<Promise<Object, Throwable>> deferreds = new ArrayList<>();
@@ -276,26 +276,26 @@ public class TestSingleThread {
             Thread.currentThread().interrupt();
         }
     }
-    
+
     @Test
-	public void testTimeout() {
-    	Deferred<Object, Throwable> deferred = deferredSupplier.get();
-		CountDownLatch latch = new CountDownLatch(1);
-		deferred.promise().fail(ex -> {
-			if (ex instanceof TimeoutException) {
-				latch.countDown();
-			}
-		});
-		deferred.withTimeout(1000, TimeUnit.MILLISECONDS, () -> new TimeoutException());
-		try {
-			Thread.sleep(2000);
-			latch.await();
-		} catch (InterruptedException e) {
-			Assert.fail(e.getMessage());
-		}
-		deferred.resolve(1);
-	}
-    
+    public void testTimeout() {
+        Deferred<Object, Throwable> deferred = deferredSupplier.get();
+        CountDownLatch latch = new CountDownLatch(1);
+        deferred.promise().fail(ex -> {
+            if (ex instanceof TimeoutException) {
+                latch.countDown();
+            }
+        });
+        deferred.withTimeout(1000, TimeUnit.MILLISECONDS, () -> new TimeoutException());
+        try {
+            Thread.sleep(2000);
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        deferred.resolve(1);
+    }
+
     @Parameters
     public static List<Object[]> data() {
         List<Object[]> list = new ArrayList<>();

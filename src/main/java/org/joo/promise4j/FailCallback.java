@@ -9,10 +9,10 @@ package org.joo.promise4j;
  */
 public interface FailCallback<F extends Throwable> {
 
-	/**
-	 * A callback to be called when the promise is rejected
-	 * 
-	 * @param failedCause the cause of the failure
-	 */
-	public void onFail(final F failedCause);
+    /**
+     * A callback to be called when the promise is rejected
+     * 
+     * @param failedCause the cause of the failure
+     */
+    public void onFail(final F failedCause);
 }

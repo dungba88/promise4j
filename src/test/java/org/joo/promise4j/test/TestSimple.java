@@ -40,14 +40,14 @@ public class TestSimple {
         } catch (UnsupportedOperationException ex) {
             Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
         }
-        
+
         try {
             deferred.promise().always(null);
             Assert.fail("must fail");
         } catch (UnsupportedOperationException ex) {
             Assert.assertEquals("Callback cannot be deferred in non-deferred mode", ex.getMessage());
         }
-        
+
         try {
             deferred.promise().get();
             Assert.fail("must fail");
@@ -56,7 +56,7 @@ public class TestSimple {
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
-        
+
         try {
             deferred.promise().get(1000, TimeUnit.MILLISECONDS);
             Assert.fail("must fail");
@@ -140,13 +140,13 @@ public class TestSimple {
             Assert.assertNull(ex);
             Assert.assertEquals(1, response);
         });
-        
+
         try {
             Assert.assertEquals(1, promise.get());
         } catch (PromiseException | InterruptedException e) {
             Assert.fail(e.getMessage());
         }
-        
+
         try {
             Assert.assertEquals(1, promise.get(1000, TimeUnit.MILLISECONDS));
         } catch (PromiseException | InterruptedException | TimeoutException e) {
@@ -167,7 +167,7 @@ public class TestSimple {
             Assert.assertNull(response);
             Assert.assertTrue(ex instanceof UnsupportedOperationException);
         });
-        
+
         try {
             promise.get();
             Assert.fail("must fail");
@@ -176,7 +176,7 @@ public class TestSimple {
         } catch (PromiseException e) {
             Assert.assertTrue(e.getCause() instanceof UnsupportedOperationException);
         }
-        
+
         try {
             promise.get(1000, TimeUnit.MILLISECONDS);
             Assert.fail("must fail");

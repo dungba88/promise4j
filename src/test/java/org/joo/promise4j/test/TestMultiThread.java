@@ -151,7 +151,7 @@ public class TestMultiThread {
         long pace = iterations * 1000000000L / ellapsed;
         System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");
     }
-    
+
     @Test
     public void testInterrupt() {
         CountDownLatch latch = new CountDownLatch(1);
@@ -174,7 +174,7 @@ public class TestMultiThread {
                 }
             });
         }
-        
+
         getWaitExecutor.shutdownNow();
 
         try {
@@ -183,7 +183,7 @@ public class TestMultiThread {
             Thread.currentThread().interrupt();
             Assert.fail(e.getMessage());
         }
-        
+
         System.out.println(atomicCounter.get());
 
         Assert.assertEquals(7, atomicCounter.get());
@@ -191,7 +191,7 @@ public class TestMultiThread {
         long pace = iterations * 1000000000L / ellapsed;
         System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");
     }
-    
+
     @Test
     public void testInterruptTimeout() {
         CountDownLatch latch = new CountDownLatch(1);
@@ -216,7 +216,7 @@ public class TestMultiThread {
                 }
             });
         }
-        
+
         getWaitExecutor.shutdownNow();
 
         try {
@@ -225,20 +225,20 @@ public class TestMultiThread {
             Thread.currentThread().interrupt();
             Assert.fail(e.getMessage());
         }
-        
+
         Assert.assertEquals(7, atomicCounter.get());
         long ellapsed = System.nanoTime() - start;
         long pace = iterations * 1000000000L / ellapsed;
         System.out.println("Testing " + deferredSupplier.get().getClass().getName() + " @ " + pace + " ops/sec");
     }
-    
+
     @Test
     public void testTimeout() {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger atomicCounter = new AtomicInteger(0);
         ExecutorService getWaitExecutor = Executors.newFixedThreadPool(7);
         int iterations = 100;
-        
+
         ThreadHints.onSpinWait();
 
         long start = System.nanoTime();
@@ -258,14 +258,14 @@ public class TestMultiThread {
                 }
             });
         }
-        
+
         try {
             latch.await(1000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             Assert.fail(e.getMessage());
         }
-        
+
         Assert.assertEquals(iterations, atomicCounter.get());
         long ellapsed = System.nanoTime() - start;
         long pace = iterations * 1000000000L / ellapsed;

@@ -9,10 +9,10 @@ package org.joo.promise4j;
  */
 public interface DoneCallback<D> {
 
-	/**
-	 * A callback to be called when the promise is fulfilled
-	 * 
-	 * @param result the result of the promise
-	 */
-	public void onDone(final D result);
+    /**
+     * A callback to be called when the promise is fulfilled
+     * 
+     * @param result the result of the promise
+     */
+    public void onDone(final D result);
 }

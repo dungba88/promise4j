@@ -26,7 +26,7 @@ public class TestFailSafe {
         CountDownLatch latch = new CountDownLatch(1);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
-                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+                                                   .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
         FailSafePromise.from(this::trySomethingException, Failsafe.with(retryPolicy).with(executor)).fail(ex -> {
             result = true;
             latch.countDown();
@@ -45,12 +45,12 @@ public class TestFailSafe {
         CountDownLatch latch = new CountDownLatch(1);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
-                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+                                                   .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
         FailSafePromise.from(this::trySomethingAfter3Exception, Failsafe.with(retryPolicy).with(executor))
-                .done(response -> {
-                    result = true;
-                    latch.countDown();
-                });
+                       .done(response -> {
+                           result = true;
+                           latch.countDown();
+                       });
         try {
             latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -65,12 +65,12 @@ public class TestFailSafe {
         CountDownLatch latch = new CountDownLatch(1);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
-                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+                                                   .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
         FailSafePromise.fromPromise(this::trySomethingAlwaysFail, Failsafe.with(retryPolicy).with(executor))
-                .fail(ex -> {
-                    result = true;
-                    latch.countDown();
-                });
+                       .fail(ex -> {
+                           result = true;
+                           latch.countDown();
+                       });
         try {
             latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -85,12 +85,12 @@ public class TestFailSafe {
         CountDownLatch latch = new CountDownLatch(1);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
-                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+                                                   .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
         FailSafePromise.fromPromise(this::trySomethingAsync, Failsafe.with(retryPolicy).with(executor))
-                .done(response -> {
-                    result = true;
-                    latch.countDown();
-                });
+                       .done(response -> {
+                           result = true;
+                           latch.countDown();
+                       });
         try {
             latch.await(10000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -105,7 +105,7 @@ public class TestFailSafe {
         CountDownLatch latch = new CountDownLatch(1);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(UnsupportedOperationException.class)
-                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
+                                                   .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(3);
         FailSafePromise.fromPromise(this::trySomethingAsync, Failsafe.with(retryPolicy).with(executor)).fail(ex -> {
             result = true;
             latch.countDown();
@@ -124,7 +124,7 @@ public class TestFailSafe {
         CountDownLatch latch = new CountDownLatch(1);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         RetryPolicy retryPolicy = new RetryPolicy().retryOn(IllegalStateException.class)
-                .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(2);
+                                                   .withDelay(100, TimeUnit.MILLISECONDS).withMaxRetries(2);
         FailSafePromise.fromPromise(this::trySomethingAsync, Failsafe.with(retryPolicy).with(executor)).fail(ex -> {
             result = true;
             latch.countDown();

@@ -14,7 +14,7 @@ import org.junit.Test;
 public class TestCompletable {
 
     private boolean result = false;
-    
+
     @Test
     public void testExternalFuture() {
         result = false;
@@ -34,16 +34,16 @@ public class TestCompletable {
         }
         Assert.assertTrue(result);
     }
-    
+
     @Test
     public void testMultiCallback() {
         ExecutorService executor = Executors.newFixedThreadPool(7);
         CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger atomicCounter = new AtomicInteger(0);
         int iterations = 1000000;
-        
+
         long start = System.currentTimeMillis();
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             final Deferred<Object, Throwable> deferred = new CompletableDeferredObject<>();
             executor.submit(() -> {
                 deferred.resolve(1);

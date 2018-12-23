@@ -18,20 +18,20 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class TestFilter {
-    
+
     private volatile boolean result = false;
-    
+
     private Supplier<Deferred<Integer, Throwable>> deferredSupplier;
-    
+
     public TestFilter(Supplier<Deferred<Integer, Throwable>> deferredSupplier) {
         this.deferredSupplier = deferredSupplier;
     }
-    
+
     @Test
     public void testDoneFilterException() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
-        
+
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
@@ -47,23 +47,23 @@ public class TestFilter {
             }
             latch.countDown();
         });
-        
+
         deferred.reject(new NullPointerException());
-        
+
         try {
             latch.await();
         } catch (InterruptedException e) {
             Assert.fail(e.getMessage());
         }
-        
+
         Assert.assertTrue(result);
     }
-    
+
     @Test
     public void testDonePipeline() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
-        
+
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
@@ -78,30 +78,30 @@ public class TestFilter {
         }).fail(ex -> {
             latch.countDown();
         });
-        
+
         deferred.resolve(1);
-        
+
         try {
             latch.await();
         } catch (InterruptedException e) {
             Assert.fail(e.getMessage());
         }
-        
+
         Assert.assertTrue(result);
     }
-    
+
     @Test
     public void testFailPipeline() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
-        
+
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
         }).filterFail(ex -> {
             return new IllegalArgumentException();
         }).filterDone(response -> {
-            return (int)response + 1;
+            return (int) response + 1;
         }).done(response -> {
             if (response == 2)
                 result = true;
@@ -109,23 +109,23 @@ public class TestFilter {
         }).fail(ex -> {
             latch.countDown();
         });
-        
+
         deferred.resolve(1);
-        
+
         try {
             latch.await();
         } catch (InterruptedException e) {
             Assert.fail(e.getMessage());
         }
-        
+
         Assert.assertTrue(result);
     }
-    
+
     @Test
     public void testFilterThrowException() {
         CountDownLatch latch = new CountDownLatch(1);
         result = false;
-        
+
         final Deferred<Integer, Throwable> deferred = deferredSupplier.get();
         deferred.promise().done(response -> {
             Assert.assertEquals(1, response.intValue());
@@ -150,24 +150,24 @@ public class TestFilter {
                 result = true;
             latch.countDown();
         });
-        
+
         deferred.resolve(1);
-        
+
         try {
             latch.await();
         } catch (InterruptedException e) {
             Assert.fail(e.getMessage());
         }
-        
+
         Assert.assertTrue(result);
     }
-    
+
     @Parameters
     public static List<Object[]> data() {
         List<Object[]> list = new ArrayList<>();
-        list.add(new Object[] {(Supplier<Deferred<Object, Throwable>>) () -> new AsyncDeferredObject<>()});
-        list.add(new Object[] {(Supplier<Deferred<Object, Throwable>>) () -> new SyncDeferredObject<>()});
-        list.add(new Object[] {(Supplier<Deferred<Object, Throwable>>) () -> new CompletableDeferredObject<>()});
+        list.add(new Object[] { (Supplier<Deferred<Object, Throwable>>) () -> new AsyncDeferredObject<>() });
+        list.add(new Object[] { (Supplier<Deferred<Object, Throwable>>) () -> new SyncDeferredObject<>() });
+        list.add(new Object[] { (Supplier<Deferred<Object, Throwable>>) () -> new CompletableDeferredObject<>() });
         return list;
     }
 }

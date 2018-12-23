@@ -13,37 +13,37 @@ import java.util.function.Supplier;
  */
 public interface Deferred<D, F extends Throwable> {
 
-	/**
-	 * Register a timeout, if time has passed and promise is not rejected or
-	 * resolved it will be rejected with TimeoutException.
-	 * 
-	 * @param timeout           the timeout
-	 * @param unit              the time unit
-	 * @param exceptionSupplier the supplier when timeout happens
-	 * @return the current promise
-	 */
-	public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier);
+    /**
+     * Register a timeout, if time has passed and promise is not rejected or
+     * resolved it will be rejected with TimeoutException.
+     * 
+     * @param timeout           the timeout
+     * @param unit              the time unit
+     * @param exceptionSupplier the supplier when timeout happens
+     * @return the current promise
+     */
+    public Deferred<D, F> withTimeout(long timeout, TimeUnit unit, Supplier<F> exceptionSupplier);
 
-	/**
-	 * Resolve the deferred
-	 * 
-	 * @param result the result of the deferred
-	 * @return the deferred itself
-	 */
-	public Deferred<D, F> resolve(final D result);
+    /**
+     * Resolve the deferred
+     * 
+     * @param result the result of the deferred
+     * @return the deferred itself
+     */
+    public Deferred<D, F> resolve(final D result);
 
-	/**
-	 * Reject the deferred
-	 * 
-	 * @param failedCause the failure cause
-	 * @return the deferred itself
-	 */
-	public Deferred<D, F> reject(final F failedCause);
+    /**
+     * Reject the deferred
+     * 
+     * @param failedCause the failure cause
+     * @return the deferred itself
+     */
+    public Deferred<D, F> reject(final F failedCause);
 
-	/**
-	 * Get the associated promise with the current deferred
-	 * 
-	 * @return the associated promise
-	 */
-	public Promise<D, F> promise();
+    /**
+     * Get the associated promise with the current deferred
+     * 
+     * @return the associated promise
+     */
+    public Promise<D, F> promise();
 }
