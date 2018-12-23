@@ -28,13 +28,6 @@ public class TestSimple {
         deferred.resolve(1);
 
         try {
-            deferred.resolve(1);
-            Assert.fail("must fail");
-        } catch (IllegalStateException ex) {
-            Assert.assertEquals("Deferred is already resolved or rejected", ex.getMessage());
-        }
-
-        try {
             deferred.promise().done(null);
             Assert.fail("must fail");
         } catch (UnsupportedOperationException ex) {
@@ -78,13 +71,6 @@ public class TestSimple {
             Assert.assertTrue(reject instanceof UnsupportedOperationException);
         });
         deferred.reject(new UnsupportedOperationException());
-
-        try {
-            deferred.reject(new UnsupportedOperationException());
-            Assert.fail("must fail");
-        } catch (IllegalStateException ex) {
-            Assert.assertEquals("Deferred is already resolved or rejected", ex.getMessage());
-        }
 
         try {
             deferred.promise().fail(null);
