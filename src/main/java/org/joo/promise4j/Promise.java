@@ -121,11 +121,11 @@ public interface Promise<D, F extends Throwable> {
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterFail(
             FilteredFailureCallback<F, F_OUT> callback);
 
-    public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofSimple(F_OUT cause) {
+    public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofCause(F_OUT cause) {
         return new SimpleFailurePromise<>(cause);
     }
     
-    public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofSimple(D_OUT result) {
+    public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> of(D_OUT result) {
         return new SimpleDonePromise<>(result);
     }
 }
