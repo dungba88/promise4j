@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dungba</groupId>
 	<artifactId>joo-promise4j</artifactId>
-	<version>1.3.2-SNAPSHOT</version>
+	<version>1.3.2</version>
 	<packaging>jar</packaging>
 
 	<name>Promise4j</name>
@@ -21,7 +21,7 @@
 	<scm>
 		<url>https://github.com/dungba88/promise4j.git</url>
 		<developerConnection>scm:git:[fetch=]https://github.com/dungba88/promise4j.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>joo-promise4j-1.3.2</tag>
   </scm>
 
 	<dependencies>
