@@ -52,6 +52,8 @@ public interface Promise<D, F extends Throwable> {
      * @return the current promise
      */
     public default Promise<D, F> forward(Deferred<D, F> deferred) {
+        if (deferred == null)
+            return this;
         return done(deferred::resolve).fail(deferred::reject);
     }
 
