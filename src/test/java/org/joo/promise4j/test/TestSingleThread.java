@@ -238,13 +238,13 @@ public class TestSingleThread {
     @Test
     public void testJoinedPromise() {
         List<Promise<Object, Throwable>> deferreds = createDeferreds();
-        testJoinedPromise(JoinedPromise.from(deferreds.toArray(new Promise[0])), deferreds);
+        testJoinedPromise(JoinedPromise.of(deferreds.toArray(new Promise[0])), deferreds);
 
         deferreds = createDeferreds();
-        testJoinedPromise(JoinedPromise.from(deferreds.toArray(new Deferred[0])), deferreds);
+        testJoinedPromise(JoinedPromise.of(deferreds.toArray(new Deferred[0])), deferreds);
 
         deferreds = createDeferreds();
-        testJoinedPromise(JoinedPromise.from(deferreds), deferreds);
+        testJoinedPromise(JoinedPromise.of(deferreds), deferreds);
     }
 
     @SuppressWarnings("unchecked")
