@@ -33,19 +33,19 @@ public class JoinedPromise<D, F extends Throwable> extends CompletableDeferredOb
     }
 
     @SafeVarargs
-    public static final <D, F extends Throwable> JoinedPromise<D, F> from(Promise<D, F>... promises) {
+    public static final <D, F extends Throwable> JoinedPromise<D, F> of(Promise<D, F>... promises) {
         return new JoinedPromise<>(promises);
     }
 
     @SuppressWarnings("unchecked")
-    public static final <D, F extends Throwable> JoinedPromise<D, F> from(Deferred<D, F>... deferreds) {
+    public static final <D, F extends Throwable> JoinedPromise<D, F> of(Deferred<D, F>... deferreds) {
         Promise<D, F>[] promises = Arrays.stream(deferreds).map(deferred -> deferred.promise())
                                          .toArray(size -> new Promise[size]);
         return new JoinedPromise<>(promises);
     }
 
     @SuppressWarnings("unchecked")
-    public static final <D, F extends Throwable> JoinedPromise<D, F> from(Collection<Promise<D, F>> promises) {
+    public static final <D, F extends Throwable> JoinedPromise<D, F> of(Collection<Promise<D, F>> promises) {
         return new JoinedPromise<>(promises.toArray(new Promise[0]));
     }
 }
