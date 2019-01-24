@@ -3,6 +3,8 @@ package org.joo.promise4j;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.joo.promise4j.impl.JoinedPromise;
+import org.joo.promise4j.impl.JoinedResults;
 import org.joo.promise4j.impl.SimpleDonePromise;
 import org.joo.promise4j.impl.SimpleFailurePromise;
 
@@ -123,11 +125,47 @@ public interface Promise<D, F extends Throwable> {
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterFail(
             FilteredFailureCallback<F, F_OUT> callback);
 
+    /**
+     * Alias for {@link #filterDone(FilteredDoneCallback)}
+     * 
+     * @param callback the callback
+     * @return the filtered promise
+     */
+    public default <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> map(FilteredDoneCallback<D, D_OUT> callback) {
+        return filterDone(callback);
+    }
+
+    /**
+     * Alias for {@link #done(FilteredDoneCallback)}
+     * 
+     * @param callback the callback
+     * @return the filtered promise
+     */
+    public default Promise<D, F> then(DoneCallback<D> callback) {
+        return done(callback);
+    }
+
+    /**
+     * Alias for {@link #pipeDone(FilteredDoneCallback)}
+     * 
+     * @param callback the callback
+     * @return the filtered promise
+     */
+    public default <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> then(
+            PipeDoneCallback<D, D_OUT, F_OUT> callback) {
+        return pipeDone(callback);
+    }
+
     public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofCause(F_OUT cause) {
         return new SimpleFailurePromise<>(cause);
     }
-    
+
     public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> of(D_OUT result) {
         return new SimpleDonePromise<>(result);
+    }
+
+    @SafeVarargs
+    public static <D, F extends Throwable> Promise<JoinedResults<D>, F> all(Promise<D, F>... promises) {
+        return JoinedPromise.of(promises);
     }
 }
