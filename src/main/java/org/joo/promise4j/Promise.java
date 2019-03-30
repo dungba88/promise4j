@@ -5,6 +5,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.joo.promise4j.impl.JoinedPromise;
 import org.joo.promise4j.impl.JoinedResults;
+import org.joo.promise4j.impl.SequentialPromise;
 import org.joo.promise4j.impl.SimpleDonePromise;
 import org.joo.promise4j.impl.SimpleFailurePromise;
 
@@ -167,5 +168,10 @@ public interface Promise<D, F extends Throwable> {
     @SafeVarargs
     public static <D, F extends Throwable> Promise<JoinedResults<D>, F> all(Promise<D, F>... promises) {
         return JoinedPromise.of(promises);
+    }
+    
+    @SafeVarargs
+    public static <D, F extends Throwable> Promise<D, F> sequence(Promise<D, F>... promises) {
+        return SequentialPromise.of(promises);
     }
 }
