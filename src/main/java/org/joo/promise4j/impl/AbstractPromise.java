@@ -21,7 +21,7 @@ public abstract class AbstractPromise<D, F extends Throwable> implements Promise
     }
 
     @Override
-    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F> filterDone(
             final FilteredDoneCallback<D, D_OUT> doneCallback) {
         return new FilteredPromise<>(this, doneCallback, null);
     }

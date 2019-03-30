@@ -1,9 +1,8 @@
 package org.joo.promise4j.impl;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Supplier;
 
-import org.joo.promise4j.Deferred;
 import org.joo.promise4j.Promise;
 
 public class SequentialPromise<D, F extends Throwable> extends CompletableDeferredObject<D, F> {
@@ -12,28 +11,21 @@ public class SequentialPromise<D, F extends Throwable> extends CompletableDeferr
 
     }
 
+    @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static final <D, F extends Throwable> Promise<D, F> of(Promise<D, F>... promises) {
-        Promise<D, F> result = null;
-        for (Promise<D, F> promise : promises) {
+    public static final <D, F extends Throwable> Promise<D, F> of(Supplier<Promise<?, ?>>... suppliers) {
+        Promise<?, ?> result = null;
+        for (Supplier<Promise<?, ?>> supplier : suppliers) {
             if (result == null)
-                result = promise;
+                result = supplier.get();
             else
-                result = result.pipeDone(r -> promise);
+                result = result.pipeDone(r -> supplier.get());
         }
-        return result;
+        return (Promise<D, F>) result;
     }
 
     @SuppressWarnings("unchecked")
-    public static final <D, F extends Throwable> Promise<D, F> of(Deferred<D, F>... deferreds) {
-        Promise<D, F>[] promises = Arrays.stream(deferreds) //
-                                         .map(deferred -> deferred.promise()) //
-                                         .toArray(size -> new Promise[size]);
-        return of(promises);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static final <D, F extends Throwable> Promise<D, F> of(Collection<Promise<D, F>> promises) {
-        return of(promises.toArray(new Promise[0]));
+    public static final <D, F extends Throwable> Promise<D, F> of(Collection<Supplier<Promise<D, F>>> promises) {
+        return of(promises.toArray(new Supplier[0]));
     }
 }

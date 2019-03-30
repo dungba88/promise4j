@@ -48,6 +48,20 @@ public class JoinedPromise<D, F extends Throwable> extends CompletableDeferredOb
     public static final <D, F extends Throwable> JoinedPromise<D, F> of(Collection<Promise<D, F>> promises) {
         return new JoinedPromise<>(promises.toArray(new Promise[0]));
     }
+
+    @SafeVarargs
+    public static final <D, F extends Throwable> JoinedPromise<D, F> from(Promise<D, F>... promises) {
+        return of(promises);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static final <D, F extends Throwable> JoinedPromise<D, F> from(Deferred<D, F>... deferreds) {
+        return of(deferreds);
+    }
+
+    public static final <D, F extends Throwable> JoinedPromise<D, F> from(Collection<Promise<D, F>> promises) {
+        return of(promises);
+    }
 }
 
 class InternalJoinedResults<D> {

@@ -1,7 +1,9 @@
 package org.joo.promise4j;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.joo.promise4j.impl.JoinedPromise;
 import org.joo.promise4j.impl.JoinedResults;
@@ -114,7 +116,7 @@ public interface Promise<D, F extends Throwable> {
      * @param callback the callback
      * @return the new promise
      */
-    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(FilteredDoneCallback<D, D_OUT> callback);
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F> filterDone(FilteredDoneCallback<D, D_OUT> callback);
 
     /**
      * Register a filtered callback when the previous promise is rejected. This
@@ -132,18 +134,8 @@ public interface Promise<D, F extends Throwable> {
      * @param callback the callback
      * @return the filtered promise
      */
-    public default <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> map(FilteredDoneCallback<D, D_OUT> callback) {
+    public default <D_OUT> Promise<D_OUT, F> map(FilteredDoneCallback<D, D_OUT> callback) {
         return filterDone(callback);
-    }
-
-    /**
-     * Alias for {@link #done(FilteredDoneCallback)}
-     * 
-     * @param callback the callback
-     * @return the filtered promise
-     */
-    public default Promise<D, F> then(DoneCallback<D> callback) {
-        return done(callback);
     }
 
     /**
@@ -170,8 +162,12 @@ public interface Promise<D, F extends Throwable> {
         return JoinedPromise.of(promises);
     }
     
+    public static <D, F extends Throwable> Promise<JoinedResults<D>, F> all(List<Promise<D, F>> promises) {
+        return JoinedPromise.of(promises);
+    }
+
     @SafeVarargs
-    public static <D, F extends Throwable> Promise<D, F> sequence(Promise<D, F>... promises) {
+    public static <D, F extends Throwable> Promise<D, F> sequence(Supplier<Promise<?, ?>>... promises) {
         return SequentialPromise.of(promises);
     }
 }

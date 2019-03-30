@@ -111,7 +111,7 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     }
 
     @Override
-    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> filterDone(
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F> filterDone(
             final FilteredDoneCallback<D, D_OUT> callback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
