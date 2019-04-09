@@ -139,7 +139,7 @@ public interface Promise<D, F extends Throwable> {
     }
 
     /**
-     * Alias for {@link #pipeDone(FilteredDoneCallback)}
+     * Alias for {@link #pipeDone(PipeDoneCallback)}
      * 
      * @param callback the callback
      * @return the filtered promise
