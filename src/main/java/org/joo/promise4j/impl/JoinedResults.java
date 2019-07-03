@@ -24,4 +24,8 @@ public class JoinedResults<D> implements Iterable<D> {
     public int size() {
         return results.size();
     }
+    
+    public List<D> getResults() {
+        return results;
+    }
 }
