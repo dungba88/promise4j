@@ -18,9 +18,14 @@ public class JoinedPromise<D, F extends Throwable> extends CompletableDeferredOb
 
     @SafeVarargs
     public JoinedPromise(Promise<D, F>... promises) {
-        int count = 0;
         final int total = promises.length;
         this.results = new InternalJoinedResults<>(total);
+        if (total == 0) {
+            this.resolve(results.toJoinedResults());
+            return;
+        }
+
+        int count = 0;
         for (Promise<D, F> promise : promises) {
             final int index = count++;
             promise.done(response -> {

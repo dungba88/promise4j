@@ -33,6 +33,15 @@ public class TestSingleThread {
     }
 
     @Test
+    public void testJoinEmpty() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        Promise.all().done(r -> {
+            latch.countDown();
+        });
+        latch.await();
+    }
+
+    @Test
     public void testResolveBefore() {
         AtomicInteger counter = new AtomicInteger(0);
         Deferred<Object, Throwable> deferred = deferredSupplier.get();
