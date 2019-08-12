@@ -2,6 +2,7 @@ package org.joo.promise4j.impl;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.AlwaysCallback;
@@ -129,6 +130,11 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
 
     @Override
     public D get(long timeout, TimeUnit unit) throws PromiseException, TimeoutException, InterruptedException {
+        throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
+    }
+
+    @Override
+    public Promise<D, F> when(Predicate<D> predicate, PipeDoneCallback<D, D, F> callback) {
         throw new UnsupportedOperationException("Callback cannot be deferred in non-deferred mode");
     }
 

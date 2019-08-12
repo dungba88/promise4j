@@ -3,6 +3,7 @@ package org.joo.promise4j;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.impl.JoinedPromise;
@@ -148,6 +149,8 @@ public interface Promise<D, F extends Throwable> {
             PipeDoneCallback<D, D_OUT, F_OUT> callback) {
         return pipeDone(callback);
     }
+    
+    public Promise<D, F> when(Predicate<D> predicate, PipeDoneCallback<D, D, F> callback);
 
     public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofCause(F_OUT cause) {
         return new SimpleFailurePromise<>(cause);
