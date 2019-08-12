@@ -10,9 +10,9 @@ public class TestConditional {
     @Test
     public void testConditional() throws PromiseException, InterruptedException {
         Promise<String, Exception> promise = Promise.of("test1");
-        var result = promise.when("test"::equals, r -> Promise.of("test2")) //
-                            .when("test1"::equals, r -> Promise.of("test3")) //
-                            .get();
+        String result = promise.when("test"::equals, r -> Promise.of("test2")) //
+                               .when("test1"::equals, r -> Promise.of("test3")) //
+                               .get();
         Assert.assertEquals("test3", result);
 
         result = promise.when("test"::equals, r -> Promise.of("test2")) //
