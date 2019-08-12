@@ -13,7 +13,7 @@ public class PipedPromise<D, F extends Throwable, D_OUT, F_OUT extends Throwable
         promise.done(response -> {
             if (doneCallback != null) {
                 try {
-                    pipe(doneCallback.onDone(response));
+                    doneCallback.onDone(response).forward(this);
                 } catch (Throwable ex) {
                     reject((F_OUT) ex);
                 }
@@ -22,20 +22,12 @@ public class PipedPromise<D, F extends Throwable, D_OUT, F_OUT extends Throwable
         }).fail(ex -> {
             if (failCallback != null) {
                 try {
-                    pipe(failCallback.onFail(ex));
+                    failCallback.onFail(ex).forward(this);
                 } catch (Throwable cause) {
                     reject((F_OUT) cause);
                 }
             } else
                 reject((F_OUT) ex);
-        });
-    }
-
-    private void pipe(final Promise<D_OUT, F_OUT> promise) {
-        promise.done(response -> {
-            resolve(response);
-        }).fail(ex -> {
-            reject(ex);
         });
     }
 }

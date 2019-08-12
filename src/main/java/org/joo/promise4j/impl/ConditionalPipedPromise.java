@@ -16,7 +16,7 @@ public class ConditionalPipedPromise<D, F extends Throwable> extends Completable
         promise.done(response -> {
             try {
                 if (predicate.test(response)) {
-                    pipe(callback.onDone(response));
+                    callback.onDone(response).forward(this);
                 } else {
                     resolve((D) response);
                 }
@@ -24,9 +24,5 @@ public class ConditionalPipedPromise<D, F extends Throwable> extends Completable
                 reject((F) ex);
             }
         }).fail(this::reject);
-    }
-
-    private void pipe(final Promise<D, F> promise) {
-        promise.forward(this);
     }
 }
