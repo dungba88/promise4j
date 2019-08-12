@@ -36,8 +36,9 @@ public class TestConditional {
         result = promise.when("test1"::equals, r -> Promise.of("test2")) //
                         .when("test1"::equals, r -> Promise.of("test3")) //
                         .map(r -> "test4") //
-                        .when("test4"::equals, r -> Promise.of("test5")) //
+                        .then(r -> Promise.of("test5")) //
+                        .when("test5"::equals, r -> Promise.of("test6")) //
                         .get();
-        Assert.assertEquals("test5", result);
+        Assert.assertEquals("test6", result);
     }
 }
