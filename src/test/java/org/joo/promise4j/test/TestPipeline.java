@@ -6,6 +6,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.Deferred;
+import org.joo.promise4j.Promise;
+import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.impl.AsyncDeferredObject;
 import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.SimpleDonePromise;
@@ -154,6 +156,88 @@ public class TestPipeline {
         }
 
         Assert.assertTrue(result);
+    }
+
+    @Test
+    public void testPipelineAlways() throws PromiseException, InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        result = false;
+
+        Deferred<Integer, Throwable> deferred = deferredSupplier.get();
+        deferred.promise().then((s, r, e) -> {
+            latch.countDown();
+            result = (r == 1);
+            return Promise.of(2);
+        });
+
+        deferred.resolve(1);
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+
+        Assert.assertTrue(result);
+        Assert.assertEquals(Integer.valueOf(1), deferred.promise().get());
+    }
+
+    @Test
+    public void testPipelineAlwaysFail() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        result = false;
+
+        Deferred<Integer, Throwable> deferred = deferredSupplier.get();
+        Promise<Integer, Throwable> promise = deferred.promise().then((s, r, e) -> {
+            latch.countDown();
+            result = (r == 1);
+            return Promise.ofCause(new RuntimeException("test"));
+        });
+
+        deferred.resolve(1);
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+
+        Assert.assertTrue(result);
+        try {
+            promise.get();
+            Assert.fail("must fail");
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof RuntimeException && e.getCause().getMessage().equals("test"));
+        }
+    }
+
+    @Test
+    public void testPipelineAlwaysReject() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        result = false;
+
+        Deferred<Integer, Throwable> deferred = deferredSupplier.get();
+        Promise<Integer, Throwable> promise = deferred.promise().then((s, r, e) -> {
+            latch.countDown();
+            result = e.getMessage().equals("hello");
+            return Promise.ofCause(new RuntimeException("test"));
+        });
+
+        deferred.reject(new RuntimeException("hello"));
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+
+        Assert.assertTrue(result);
+        try {
+            promise.get();
+            Assert.fail("must fail");
+        } catch (PromiseException e) {
+            Assert.assertTrue(e.getCause() instanceof RuntimeException && e.getCause().getMessage().equals("test"));
+        }
     }
 
     @Test
