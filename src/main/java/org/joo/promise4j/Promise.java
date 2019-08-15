@@ -1,10 +1,13 @@
 package org.joo.promise4j;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
+import org.joo.promise4j.impl.CompletableDeferredObject;
 import org.joo.promise4j.impl.JoinedPromise;
 import org.joo.promise4j.impl.JoinedResults;
 import org.joo.promise4j.impl.SequentialPromise;
@@ -149,6 +152,8 @@ public interface Promise<D, F extends Throwable> {
         return pipeDone(callback);
     }
 
+    public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> then(PipeAlwaysCallback<D, D_OUT, F, F_OUT> callback);
+
     public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofCause(F_OUT cause) {
         return new SimpleFailurePromise<>(cause);
     }
@@ -161,7 +166,7 @@ public interface Promise<D, F extends Throwable> {
     public static <D, F extends Throwable> Promise<JoinedResults<D>, F> all(Promise<D, F>... promises) {
         return JoinedPromise.of(promises);
     }
-    
+
     public static <D, F extends Throwable> Promise<JoinedResults<D>, F> all(List<Promise<D, F>> promises) {
         return JoinedPromise.of(promises);
     }
@@ -169,5 +174,17 @@ public interface Promise<D, F extends Throwable> {
     @SafeVarargs
     public static <D, F extends Throwable> Promise<D, F> sequence(Supplier<Promise<?, ?>>... promises) {
         return SequentialPromise.of(promises);
+    }
+
+    public static <D, F extends Throwable> Promise<D, F> supply(Supplier<D> supplier) {
+        return supply(ForkJoinPool.commonPool(), supplier);
+    }
+
+    public static <D, F extends Throwable> Promise<D, F> supply(Executor executor, Supplier<D> supplier) {
+        CompletableDeferredObject<D, F> deferred = new CompletableDeferredObject<>();
+        executor.execute(() -> {
+            deferred.resolve(supplier.get());
+        });
+        return deferred;
     }
 }
