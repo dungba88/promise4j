@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.joo.promise4j.impl.CompletableDeferredObject;
@@ -151,6 +152,8 @@ public interface Promise<D, F extends Throwable> {
             PipeDoneCallback<D, D_OUT, F_OUT> callback) {
         return pipeDone(callback);
     }
+    
+    public Promise<D, F> when(Predicate<D> predicate, PipeDoneCallback<D, D, F> callback);
 
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> then(PipeAlwaysCallback<D, D_OUT, F, F_OUT> callback);
 
