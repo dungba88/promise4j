@@ -84,18 +84,18 @@ The done callback will be invoked when `resolve()` is called with a response, an
 
 ### pipe and filter
 
-You can also chain the processing via `pipeDone()`, `pipeFail`, `filterDone()` and `filterFail()`:
+You can also chain the processing via `then()` (formerly `pipeDone()`), `pipeFail`, `map()` (formerly `filterDone()`) and `filterFail()`:
 
 ```java
-deferred.promise().pipeDone(response -> {
+deferred.promise().then(response -> {
     // this will be called only when the original deferred resolved successfully
     // it will create new stage
     return somePromise;
-}).pipeDone(response -> {
+}).then(response -> {
     // this will be called only when the preceding executed stage resolve successfully
     // it will create new stage
     return somePromise;
-}).filterDone(response -> {
+}).map(response -> {
     // this will be called only when the preceeding executed stage resolve successfully
     // it will create new stage
     return someResponse;
@@ -107,13 +107,16 @@ deferred.promise().pipeDone(response -> {
     // this will be called only when the preceding executed stage is rejected
     // it will create new stage
     return someException;
+}).then((status, result, ex) -> {
+    // same as always() but allow you to chain
+    return somePromise;
 }).done(response -> {
     // this will be called only when the preceding executed stage resolve successfully
     // it will not create any stage
 }).fail(response -> {
     // this will be called only when the preceding executed stage is rejected
     // it will not create any stage
-}).pipeDone(... // do it all again if you wish);
+}).then(... // do it all again if you wish);
 ```
 
 *Note on exception type*
@@ -121,7 +124,7 @@ deferred.promise().pipeDone(response -> {
 If any exception is thrown while executing the preceding stage, that stage is considered rejected with the thrown exception as cause. So be careful with the type of the exception you received, it might be the type of the preceding stage's promise failPipe/failFilter or it also can be the type of the thrown exception. For example:
 
 ```java
-...pipeDone(response -> {
+...then(response -> {
     if (...)    // some condition that raise the exception
         throw new IllegalArgumentException();
     return new SimpleFailurePromise(new UnsupportedOperationException());
@@ -135,7 +138,7 @@ Best practice is that you always be consistent in the exception type and try not
 1. Wrap your pipe handler with a try-catch block and reject the promise yourself with the expected exception type:
 
 ```java
-...pipeDone(response -> {
+...then(response -> {
     try {
         if (...)    // some condition that raise the exception
             throw new IllegalArgumentException();
@@ -154,7 +157,7 @@ Best practice is that you always be consistent in the exception type and try not
 2. Explicitly use a PipeDoneCallback<ANY_TYPE, ANY_TYPE, Exception> or PipeFailureCallback<ANY_TYPE, ANY_TYPE, Exception> to cover all exception types.
 
 ```java
-...pipeDone((PipeDoneCallback<Integer, Integer, Exception>)response -> {
+...then((PipeDoneCallback<Integer, Integer, Exception>)response -> {
     // return promise of Exception type
 }).pipeFail(ex -> {
     // ex can be of any type here
@@ -206,7 +209,7 @@ Promise promise = FailSafePromise.fromPromise(() -> {
 }, Failsafe.with(retryPolicy).with(executor));
 
 // use the promise as usual
-promise.done(...).fail(...).pipeDone(...);
+promise.done(...).fail(...).then(...);
 ```
 
 The `RetryPolicy`, `FailSafe` is coming from [@jhalterman/failsafe](https://github.com/jhalterman/failsafe). You can refer to their manual for more details. The promise will only accept a `AsyncFailSafe` (by calling `.with(executor)`). A retry will be triggered to the `FailSafe` engine if one the following conditions are satisfied:
