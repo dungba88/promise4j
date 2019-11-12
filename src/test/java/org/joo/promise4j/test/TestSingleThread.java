@@ -305,6 +305,25 @@ public class TestSingleThread {
         deferred.resolve(1);
     }
 
+    @Test
+    public void testTimeoutPromise() {
+        Deferred<Object, Throwable> deferred = deferredSupplier.get();
+        CountDownLatch latch = new CountDownLatch(1);
+        deferred.promise().fail(ex -> {
+            if (ex instanceof TimeoutException) {
+                latch.countDown();
+            }
+        }).timeoutAfter(1000, TimeUnit.MILLISECONDS, () -> new TimeoutException());
+
+        try {
+            Thread.sleep(2000);
+            latch.await();
+        } catch (InterruptedException e) {
+            Assert.fail(e.getMessage());
+        }
+        deferred.resolve(1);
+    }
+
     @Parameters
     public static List<Object[]> data() {
         List<Object[]> list = new ArrayList<>();

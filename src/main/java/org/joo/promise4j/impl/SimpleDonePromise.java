@@ -2,6 +2,7 @@ package org.joo.promise4j.impl;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.DeferredStatus;
@@ -48,5 +49,11 @@ public class SimpleDonePromise<D, F extends Throwable> extends AbstractPromise<D
     @Override
     public DeferredStatus getStatus() {
         return DeferredStatus.RESOLVED;
+    }
+
+    @Override
+    public Promise<D, F> timeoutAfter(long duration, TimeUnit unit, Supplier<F> exceptionSupplier) {
+        // do nothing
+        return this;
     }
 }
