@@ -103,6 +103,12 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
     }
 
     @Override
+    public Promise<D, F> timeoutAfter(long duration, TimeUnit unit, Supplier<F> exceptionSupplier) {
+        withTimeout(duration, unit, exceptionSupplier);
+        return this;
+    }
+
+    @Override
     public DeferredStatus getStatus() {
         if (!future.isDone())
             return null;

@@ -20,4 +20,11 @@
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>gitignore</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/.gitignore</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

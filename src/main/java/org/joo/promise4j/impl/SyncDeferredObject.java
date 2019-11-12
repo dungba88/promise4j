@@ -159,4 +159,10 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
     public DeferredStatus getStatus() {
         return status;
     }
+
+    @Override
+    public Promise<D, F> timeoutAfter(long duration, TimeUnit unit, Supplier<F> exceptionSupplier) {
+        withTimeout(duration, unit, exceptionSupplier);
+        return this;
+    }
 }

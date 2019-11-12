@@ -152,10 +152,12 @@ public interface Promise<D, F extends Throwable> {
             PipeDoneCallback<D, D_OUT, F_OUT> callback) {
         return pipeDone(callback);
     }
-    
+
     public Promise<D, F> when(Predicate<D> predicate, PipeDoneCallback<D, D, F> callback);
 
     public <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> then(PipeAlwaysCallback<D, D_OUT, F, F_OUT> callback);
+
+    public Promise<D, F> timeoutAfter(long duration, TimeUnit unit, Supplier<F> exceptionSupplier);
 
     public static <D_OUT, F_OUT extends Throwable> Promise<D_OUT, F_OUT> ofCause(F_OUT cause) {
         return new SimpleFailurePromise<>(cause);
@@ -190,4 +192,5 @@ public interface Promise<D, F extends Throwable> {
         });
         return deferred;
     }
+
 }

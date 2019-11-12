@@ -151,6 +151,12 @@ public class SimpleDeferredObject<D, F extends Throwable> implements Deferred<D,
     }
 
     @Override
+    public Promise<D, F> timeoutAfter(long duration, TimeUnit unit, Supplier<F> exceptionSupplier) {
+        withTimeout(duration, unit, exceptionSupplier);
+        return this;
+    }
+
+    @Override
     public DeferredStatus getStatus() {
         return status;
     }
