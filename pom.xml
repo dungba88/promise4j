@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dungba</groupId>
 	<artifactId>joo-promise4j</artifactId>
-	<version>1.6.1-SNAPSHOT</version>
+	<version>1.6.1</version>
 	<packaging>jar</packaging>
 
 	<name>Promise4j</name>
@@ -21,7 +21,7 @@
 	<scm>
 		<url>https://github.com/dungba88/promise4j.git</url>
 		<developerConnection>scm:git:[fetch=]https://github.com/dungba88/promise4j.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>joo-promise4j-1.6.1</tag>
   </scm>
 
 	<dependencies>
@@ -96,7 +96,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0-M1</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
