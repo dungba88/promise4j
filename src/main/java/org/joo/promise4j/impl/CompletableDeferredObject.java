@@ -1,12 +1,5 @@
 package org.joo.promise4j.impl;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
-
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
@@ -16,6 +9,13 @@ import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.util.FutureCanceller;
 import org.joo.promise4j.util.TimeoutScheduler;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 public class CompletableDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -31,26 +31,19 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
 
     @Override
     public Promise<D, F> done(final DoneCallback<D> callback) {
-        future.thenAccept((response) -> callback.onDone(response));
+        future.thenAccept(response -> complete(callback, response));
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Promise<D, F> fail(final FailCallback<F> callback) {
-        future.exceptionally(ex -> {
-            callback.onFail((F) ex);
-            return null;
-        });
+        future.exceptionally(ex -> complete(callback, ex));
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Promise<D, F> always(AlwaysCallback<D, F> callback) {
-        future.whenComplete((result, cause) -> {
-            callback.onAlways(cause != null ? DeferredStatus.REJECTED : DeferredStatus.RESOLVED, result, (F) cause);
-        });
+        future.whenComplete((result, cause) -> complete(callback, result, cause));
         return this;
     }
 

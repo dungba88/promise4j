@@ -1,15 +1,15 @@
 package org.joo.promise4j.impl;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
-
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.DeferredStatus;
 import org.joo.promise4j.DoneCallback;
 import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 public class SimpleDonePromise<D, F extends Throwable> extends AbstractPromise<D, F> {
 
@@ -21,7 +21,7 @@ public class SimpleDonePromise<D, F extends Throwable> extends AbstractPromise<D
 
     @Override
     public Promise<D, F> done(final DoneCallback<D> callback) {
-        callback.onDone(result);
+        complete(callback, result);
         return this;
     }
 
@@ -32,7 +32,7 @@ public class SimpleDonePromise<D, F extends Throwable> extends AbstractPromise<D
 
     @Override
     public Promise<D, F> always(AlwaysCallback<D, F> callback) {
-        callback.onAlways(DeferredStatus.RESOLVED, result, null);
+        complete(callback, result, null);
         return this;
     }
 

@@ -1,10 +1,5 @@
 package org.joo.promise4j.impl;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.Supplier;
-
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
@@ -13,6 +8,11 @@ import org.joo.promise4j.FailCallback;
 import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.util.TimeoutScheduler;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -95,17 +95,17 @@ public class SyncDeferredObject<D, F extends Throwable> extends AbstractPromise<
 
     private void triggerDone(final DoneCallback<D> callback, final D resolve) {
         if (callback != null)
-            callback.onDone(resolve);
+            complete(callback, resolve);
     }
 
     private void triggerFail(final FailCallback<F> callback, final F reject) {
         if (callback != null)
-            callback.onFail(reject);
+            complete(callback, reject);
     }
 
     private void triggerAlways(final AlwaysCallback<D, F> callback, final D resolve, final F reject) {
         if (callback != null)
-            callback.onAlways(status, resolve, reject);
+            complete(callback, resolve, reject);
 
         latch.countDown();
     }

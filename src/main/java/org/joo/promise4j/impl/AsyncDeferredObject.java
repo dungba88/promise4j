@@ -1,11 +1,5 @@
 package org.joo.promise4j.impl;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.LockSupport;
-import java.util.function.Supplier;
-
 import org.joo.promise4j.AlwaysCallback;
 import org.joo.promise4j.Deferred;
 import org.joo.promise4j.DeferredStatus;
@@ -15,6 +9,12 @@ import org.joo.promise4j.Promise;
 import org.joo.promise4j.PromiseException;
 import org.joo.promise4j.util.ThreadHints;
 import org.joo.promise4j.util.TimeoutScheduler;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.LockSupport;
+import java.util.function.Supplier;
 
 public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise<D, F> implements Deferred<D, F> {
 
@@ -66,16 +66,16 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
 
     private void onComplete(final D result) {
         if (doneCallback != null && alert.compareAndSet(false, true))
-            doneCallback.onDone(result);
+            complete(doneCallback, result);
         if (alwaysCallback != null && alwaysAlert.compareAndSet(false, true))
-            alwaysCallback.onAlways(DeferredStatus.RESOLVED, result, null);
+            complete(alwaysCallback, result, null);
     }
 
     private void onFail(final F failedCause) {
         if (failureCallback != null && alert.compareAndSet(false, true))
-            failureCallback.onFail(failedCause);
+            complete(failureCallback, failedCause);
         if (alwaysCallback != null && alwaysAlert.compareAndSet(false, true))
-            alwaysCallback.onAlways(DeferredStatus.REJECTED, null, failedCause);
+            complete(alwaysCallback, null, failedCause);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     public Promise<D, F> always(AlwaysCallback<D, F> callback) {
         alwaysCallback = callback;
         if (status != null && alwaysAlert.compareAndSet(false, true))
-            callback.onAlways(status, result, failedCause);
+            complete(callback, result, failedCause);
         return this;
     }
 
@@ -95,7 +95,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     public Promise<D, F> done(final DoneCallback<D> callback) {
         doneCallback = callback;
         if (status == DeferredStatus.RESOLVED && alert.compareAndSet(false, true))
-            callback.onDone(result);
+            complete(callback, result);
         return this;
     }
 
@@ -103,7 +103,7 @@ public class AsyncDeferredObject<D, F extends Throwable> extends AbstractPromise
     public Promise<D, F> fail(final FailCallback<F> callback) {
         this.failureCallback = callback;
         if (status == DeferredStatus.REJECTED && alert.compareAndSet(false, true))
-            callback.onFail(failedCause);
+            complete(callback, failedCause);
         return this;
     }
 
