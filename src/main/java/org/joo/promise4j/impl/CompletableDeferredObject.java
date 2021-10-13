@@ -107,4 +107,8 @@ public class CompletableDeferredObject<D, F extends Throwable> extends AbstractP
             return null;
         return future.isCompletedExceptionally() ? DeferredStatus.REJECTED : DeferredStatus.RESOLVED;
     }
+
+    public CompletableFuture<D> toCompletableFuture() {
+        return future;
+    }
 }
